@@ -211,6 +211,63 @@ test('--force bypasses the cache', async () => {
   assert.ok(fetchImpl.calls.length > before);
 });
 
+test('a resolved manifest record seeds the cache, so CI never re-pays for it', async () => {
+  // A fresh checkout has no cache file. The resolver seeds from the committed
+  // manifest instead; without this, a full CI run would re-request all 405
+  // slots and overrun the provider rate limit.
+  const fetchImpl = mockFetch({ 'api.unsplash.com': { results: [unsplashPhoto()] } });
+
+  const first = await resolveAll([uganda], {
+    cache: { version: 1, entries: {} },
+    credentials: BOTH_KEYS,
+    fetchImpl,
+    categories: ['wildlife'],
+  });
+  const resolved = first.records[0];
+  assert.equal(resolved.status, STATUS.RESOLVED);
+  const callsSoFar = fetchImpl.calls.length;
+
+  // Simulate the fresh checkout: empty cache, seeded the way the CLI does it.
+  const coldCache = { version: 1, entries: {} };
+  coldCache.entries[cacheKey(resolved)] = resolved;
+
+  const second = await resolveAll([uganda], {
+    cache: coldCache,
+    credentials: BOTH_KEYS,
+    fetchImpl,
+    categories: ['wildlife'],
+  });
+
+  assert.equal(second.stats.fromCache, 1);
+  assert.equal(fetchImpl.calls.length, callsSoFar, 'no provider request was made');
+  assert.equal(second.records[0].photoId, resolved.photoId);
+});
+
+test('an unresolved record is NOT seeded, so gaps are retried on the next run', async () => {
+  const empty = mockFetch({ 'api.unsplash.com': { results: [] }, 'api.pexels.com': { photos: [] } });
+  const { records } = await resolveAll([uganda], {
+    cache: { version: 1, entries: {} },
+    credentials: BOTH_KEYS,
+    fetchImpl: empty,
+    categories: ['wildlife'],
+  });
+  assert.equal(records[0].status, STATUS.UNRESOLVED);
+
+  // Same seeding rule the CLI applies: resolved only.
+  const coldCache = { version: 1, entries: {} };
+  if (records[0].status === STATUS.RESOLVED) coldCache.entries[cacheKey(records[0])] = records[0];
+  assert.deepEqual(coldCache.entries, {}, 'an unresolved slot must not be cached away');
+
+  const retry = mockFetch({ 'api.unsplash.com': { results: [unsplashPhoto()] } });
+  const second = await resolveAll([uganda], {
+    cache: coldCache,
+    credentials: BOTH_KEYS,
+    fetchImpl: retry,
+    categories: ['wildlife'],
+  });
+  assert.equal(second.records[0].status, STATUS.RESOLVED, 'the gap should be retried');
+});
+
 test('an expired cache entry is treated as absent', () => {
   const cache = { version: 1, entries: {} };
   writeCache(cache, entry, { status: 'resolved', resolvedAt: '2000-01-01T00:00:00.000Z' });

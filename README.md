@@ -47,6 +47,31 @@ on the other thirteen. `build-pages` and `validate` never contact a provider —
 Keys are read only by the scripts, from the environment or `.env`. They are never written
 into a page; `tourism:validate` greps the built HTML to prove it.
 
+Already-resolved slots are seeded from the committed manifest, so re-running the resolver
+costs nothing for photographs you already have — only the gaps are retried. That matters
+under Unsplash's Demo tier, whose hourly allowance is smaller than a full run (~27
+requests per destination, fifteen destinations). Work through it a country at a time until
+your app is approved for Production:
+
+```sh
+npm run tourism:resolve-images -- --country uganda
+npm run tourism:resolve-images -- --country kenya     # an hour later
+```
+
+### Running it on GitHub instead
+
+`.github/workflows/tourism-images.yml` does the same three steps and opens a pull request
+with the result. It runs on demand (with `country` / `category` / `provider` / `force`
+inputs) and monthly. It needs two **repository** secrets — Settings → Secrets and
+variables → Actions:
+
+- `UNSPLASH_ACCESS_KEY`
+- `PEXELS_API_KEY`
+
+Those are the only place credentials belong. In particular they do **not** go in Vercel's
+environment variables: Vercel serves committed HTML and never runs the resolver, so a key
+there would be exposure without purpose.
+
 ### Where things live
 
 | Path | What it is |

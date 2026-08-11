@@ -18,7 +18,7 @@ import { COUNTRIES, ALL_DESTINATIONS, getDestination } from '../data/countries/i
 import { CATEGORY_IDS } from '../data/categories.js';
 import { getCredentials, describeCredentials } from '../lib/env.js';
 import { loadCache, saveCache } from '../lib/cache.js';
-import { resolveAll, STATUS } from '../lib/resolver.js';
+import { resolveAll, STATUS, cacheKey } from '../lib/resolver.js';
 import { loadManifest, saveManifest } from '../lib/manifest.js';
 
 function parseArgs(argv) {
@@ -141,7 +141,22 @@ async function main() {
     process.exit(1);
   }
 
+  // Seed the cache from the committed manifest. The cache file is local and
+  // gitignored, so on a fresh checkout (CI, or a new clone) it is empty — and
+  // without this every already-resolved slot would be paid for again, which
+  // overruns the provider rate limit on a full run. Unresolved records are
+  // deliberately not seeded, so each run retries the gaps.
   const cache = loadCache();
+  let seeded = 0;
+  for (const record of loadManifest().records) {
+    if (record.status !== STATUS.RESOLVED || !record.searchQuery) continue;
+    const key = cacheKey(record);
+    if (cache.entries[key]) continue;
+    cache.entries[key] = record;
+    seeded += 1;
+  }
+  if (seeded) console.log(`  seeded         ${seeded} resolved slots from the manifest`);
+
   const { records, stats } = await resolveAll(destinations, {
     cache,
     force: opts.force,
