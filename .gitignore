@@ -1,0 +1,4 @@
+.env
+node_modules/
+tourism/cache/*.json
+!tourism/cache/.gitkeep

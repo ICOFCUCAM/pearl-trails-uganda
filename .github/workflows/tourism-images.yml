@@ -1,0 +1,169 @@
+name: Resolve tourism photography
+
+# Fills the East Africa tourism image manifest from Unsplash and Pexels, then
+# regenerates the pages and opens a pull request with the result.
+#
+# This is the ONLY place the provider keys are needed. The deployed site is
+# committed static HTML, so nothing at deploy time or at runtime ever reads
+# them — which is why they belong in repository secrets here and nowhere else
+# (in particular, not in Vercel's environment variables).
+#
+# Rate limits shape how you drive this. Unsplash's Demo tier allows far fewer
+# requests per hour than a full run needs (~27 per destination, 15
+# destinations). Run it one country at a time with the `country` input until
+# your app is approved for Production; the resolver caches results for 90 days,
+# so an interrupted or partial run resumes without re-spending the budget.
+
+on:
+  workflow_dispatch:
+    inputs:
+      country:
+        description: 'Destination slug (uganda, kenya, …). Blank resolves all fifteen.'
+        required: false
+        type: string
+      category:
+        description: 'Category id (hero, wildlife, …). Blank resolves all twenty-seven.'
+        required: false
+        type: string
+      provider:
+        description: 'Force a single provider instead of Unsplash-then-Pexels.'
+        required: false
+        type: choice
+        options: ['', 'unsplash', 'pexels']
+        default: ''
+      force:
+        description: 'Ignore cached resolutions and re-resolve.'
+        required: false
+        type: boolean
+        default: false
+
+  schedule:
+    # 04:00 UTC on the 1st of each month. Cached slots cost nothing, so this
+    # only spends API budget on slots that are still unresolved or expired.
+    - cron: '0 4 1 * *'
+
+# Needed to push the refresh branch and open the pull request.
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: tourism-images
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      BRANCH: tourism/refresh-images
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # No `npm ci` step: the project has no runtime or build dependencies.
+      # Everything under tourism/ uses Node built-ins only.
+
+      - name: Check credentials are present
+        env:
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        run: |
+          if [ -z "$UNSPLASH_ACCESS_KEY" ] && [ -z "$PEXELS_API_KEY" ]; then
+            echo "::error::Neither UNSPLASH_ACCESS_KEY nor PEXELS_API_KEY is set."
+            echo "Add them under Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          [ -n "$UNSPLASH_ACCESS_KEY" ] || echo "::warning::No Unsplash key — Pexels will be the only provider."
+          [ -n "$PEXELS_API_KEY" ] || echo "::warning::No Pexels key — there is no fallback if Unsplash has nothing."
+
+      - name: Verify the system before spending API budget
+        run: |
+          npm run typecheck
+          npm run lint
+          npm test
+
+      - name: Resolve images
+        env:
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          # Inputs go through the environment rather than being interpolated
+          # into the script body: `${{ inputs.country }}` inline would let a
+          # crafted input run as shell.
+          INPUT_COUNTRY: ${{ inputs.country }}
+          INPUT_CATEGORY: ${{ inputs.category }}
+          INPUT_PROVIDER: ${{ inputs.provider }}
+          INPUT_FORCE: ${{ inputs.force }}
+        run: |
+          # Explicit `if` blocks rather than `[ … ] && …`: steps run under
+          # `bash -e`, where a false test as the last line of a list fails the
+          # whole step.
+          args=()
+          if [ -n "$INPUT_COUNTRY" ];  then args+=(--country  "$INPUT_COUNTRY");  fi
+          if [ -n "$INPUT_CATEGORY" ]; then args+=(--category "$INPUT_CATEGORY"); fi
+          if [ -n "$INPUT_PROVIDER" ]; then args+=(--provider "$INPUT_PROVIDER"); fi
+          if [ "$INPUT_FORCE" = "true" ]; then args+=(--force); fi
+          node tourism/scripts/resolve-images.mjs "${args[@]}"
+
+      - name: Rebuild the pages
+        run: npm run tourism:build-pages
+
+      - name: Audit
+        # Exits non-zero on errors only — broken URLs, duplicates, missing
+        # captions or alt text, invalid provider records, or a key that reached
+        # the built HTML. Unresolved slots are warnings, so a partial run under
+        # a Demo-tier rate limit still passes.
+        run: npm run tourism:validate
+
+      - name: Commit and open a pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          # --porcelain rather than `git diff --quiet` so a brand new file
+          # (a first-ever manifest, say) also counts as a change.
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No image changes — nothing to publish."
+            exit 0
+          fi
+
+          git checkout -B "$BRANCH"
+          git add tourism/manifest destinations east-africa.html ./*.html
+          git commit \
+            -m 'Refresh East Africa tourism photography' \
+            -m 'Resolved from Unsplash and Pexels via tourism:resolve-images. Manifest and generated pages rebuilt; tourism:validate passed.'
+
+          # Plain --force: this branch is recreated from the default branch on
+          # every run and is owned solely by this workflow. --force-with-lease
+          # would need origin/$BRANCH fetched first to have anything to lease.
+          git push --force -u origin "$BRANCH"
+
+          existing=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            echo "Updated existing pull request #$existing."
+            exit 0
+          fi
+
+          # A heredoc, not an inline --body string: YAML strips this block's
+          # common indentation, so bash sees these lines flush left. Leaving
+          # them indented would make Markdown render the body as a code block.
+          cat > /tmp/pr-body.md <<'BODY'
+          Automated run of `tourism:resolve-images`, followed by `tourism:build-pages` and `tourism:validate`.
+
+          Every image URL, photo id and credit in this diff came from a provider API response. Slots with no suitable photograph are recorded as unresolved rather than filled — see the audit output in the workflow log for current coverage.
+
+          Review the photographs before merging: the ranker enforces country and category relevance, but it cannot judge whether a specific image is the right one.
+          BODY
+
+          gh pr create \
+            --head "$BRANCH" \
+            --title 'Refresh East Africa tourism photography' \
+            --body-file /tmp/pr-body.md

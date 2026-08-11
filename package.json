@@ -1,0 +1,20 @@
+{
+  "name": "pearl-trails-uganda",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pearl Trails Uganda — static site plus the East Africa tourism image system (build-time tooling only; the deployed site stays dependency-free static HTML).",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "tourism:resolve-images": "node tourism/scripts/resolve-images.mjs",
+    "tourism:validate": "node tourism/scripts/validate.mjs",
+    "tourism:build-pages": "node tourism/scripts/build-pages.mjs",
+    "tourism:build": "npm run tourism:build-pages && npm run tourism:validate",
+    "test": "node --test \"tourism/tests/*.test.mjs\"",
+    "typecheck": "node --check tourism/scripts/resolve-images.mjs && node tourism/scripts/typecheck.mjs",
+    "lint": "node tourism/scripts/lint.mjs",
+    "build": "npm run tourism:build-pages"
+  }
+}
