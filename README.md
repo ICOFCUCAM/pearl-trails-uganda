@@ -58,6 +58,51 @@ npm run tourism:resolve-images -- --country uganda
 npm run tourism:resolve-images -- --country kenya     # an hour later
 ```
 
+### Choosing between candidates
+
+The ranker is good at "is this the right country and the right subject". It cannot judge
+whether a photograph is actually the one you want. Three commands close that gap:
+
+```sh
+npm run tourism:prompts           # 405 art-direction briefs, one per slot
+npm run tourism:review            # contact sheet: references beside ranked candidates
+npm run tourism:apply-overrides   # apply your pinned choices to the manifest
+```
+
+**`tourism:prompts`** composes a generation brief for every slot from data already in the
+repo — the country's own look, the category's photographic intent, the authored subject,
+and the render role's aspect ratio and negative-space requirements. Output goes to
+`tourism/prompts/`: one paste-ready `.md` per destination, plus a JSON file for tooling.
+It generates nothing itself; it emits the instructions you feed to an image generator.
+
+Put the results in `tourism/generated/` as `<country>-<category>.<ext>`. They are
+**reference targets** — the shot you are trying to find, used to judge the stock
+candidates. `tourism/generated/README.md` sets out what would have to be true before one
+of them belonged on the site itself; the short version is that a generated image of
+Bwindi is not a photograph of Bwindi, and a tourism page implies the latter.
+
+**`tourism:review`** builds `tourism/review/index.html` — for each slot, the brief and the
+generated reference beside the ranked Unsplash and Pexels candidates, each with its score
+breakdown so a bad pick can be explained rather than guessed at. Every candidate has a
+"Pin this" button that copies its `overrides.json` entry to the clipboard, and every slot
+has "None of these".
+
+**`tourism/data/overrides.json`** is the human verdict, and it wins:
+
+```json
+{
+  "uganda/wildlife": { "provider": "unsplash", "photoId": "abc123", "why": "the ranker picked a lowland gorilla" },
+  "uganda/beaches":  { "status": "unresolved", "why": "every result is an ocean beach" }
+}
+```
+
+An override can only name a photograph already in `tourism/manifest/candidates.json`, so
+applying one needs no API call and cannot fabricate anything — the full provider response
+is on disk. Naming a photo that was never a candidate is an error that leaves the manifest
+untouched, rather than a silent no-op that lets you think your decision took effect.
+Hand-pinning is also the easiest way to use one photograph twice, so a duplicate check
+runs after overrides are applied.
+
 ### Running it on GitHub instead
 
 `.github/workflows/tourism-images.yml` does the same three steps and opens a pull request

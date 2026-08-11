@@ -2,3 +2,10 @@
 node_modules/
 tourism/cache/*.json
 !tourism/cache/.gitkeep
+
+# Generated reference images: large and regenerable. The README stays.
+tourism/generated/*
+!tourism/generated/README.md
+
+# Review sheets are a local tool, rebuilt by `npm run tourism:review`.
+tourism/review/

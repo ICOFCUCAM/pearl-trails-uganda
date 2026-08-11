@@ -20,6 +20,7 @@ import { getCredentials, describeCredentials } from '../lib/env.js';
 import { loadCache, saveCache } from '../lib/cache.js';
 import { resolveAll, STATUS, cacheKey } from '../lib/resolver.js';
 import { loadManifest, saveManifest } from '../lib/manifest.js';
+import { saveCandidates } from '../lib/candidates.js';
 
 function parseArgs(argv) {
   const opts = {
@@ -157,7 +158,7 @@ async function main() {
   }
   if (seeded) console.log(`  seeded         ${seeded} resolved slots from the manifest`);
 
-  const { records, stats } = await resolveAll(destinations, {
+  const { records, candidates, stats } = await resolveAll(destinations, {
     cache,
     force: opts.force,
     categories: opts.categories.length ? opts.categories : null,
@@ -166,6 +167,11 @@ async function main() {
     log: (line) => console.log(line),
   });
   saveCache(cache);
+
+  // The ranked shortlist per slot, kept for the review sheet and as the pool
+  // that overrides pin from — so changing a pick later needs no API call.
+  const shortlisted = Object.keys(candidates).length;
+  if (shortlisted) saveCandidates(candidates);
 
   // Merge into the existing manifest so a partial run (--country kenya) does
   // not discard everything else.
@@ -187,7 +193,9 @@ async function main() {
   console.log(`  unsplash       ${unsplashCount}`);
   console.log(`  pexels         ${pexelsCount}`);
   console.log(`  unresolved     ${unresolved}`);
-  console.log('\nNext: npm run tourism:build-pages && npm run tourism:validate');
+  console.log(`  shortlisted    ${shortlisted} slot(s) with candidates recorded`);
+  console.log('\nNext: npm run tourism:review    (compare against the generated references)');
+  console.log('      npm run tourism:build-pages && npm run tourism:validate');
 }
 
 main().catch((error) => {

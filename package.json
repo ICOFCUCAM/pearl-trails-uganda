@@ -10,6 +10,9 @@
   "scripts": {
     "tourism:resolve-images": "node tourism/scripts/resolve-images.mjs",
     "tourism:validate": "node tourism/scripts/validate.mjs",
+    "tourism:prompts": "node tourism/scripts/generate-prompts.mjs",
+    "tourism:review": "node tourism/scripts/build-review.mjs",
+    "tourism:apply-overrides": "node tourism/scripts/apply-overrides.mjs",
     "tourism:build-pages": "node tourism/scripts/build-pages.mjs",
     "tourism:build": "npm run tourism:build-pages && npm run tourism:validate",
     "test": "node --test \"tourism/tests/*.test.mjs\"",

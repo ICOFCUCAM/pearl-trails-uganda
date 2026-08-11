@@ -146,6 +146,7 @@ export async function resolveEntry(entry, destination, opts) {
     only = null,
     fetchImpl,
     log = () => {},
+    onCandidates = null,
   } = opts;
 
   const role = roleOf(getCategory(entry.category));
@@ -193,7 +194,27 @@ export async function resolveEntry(entry, destination, opts) {
       continue;
     }
 
-    const { best, rejected } = rankCandidates(usable, entry, destination, usedPhotoKeys);
+    const { best, scored, rejected } = rankCandidates(usable, entry, destination, usedPhotoKeys);
+
+    // Hand the ranked shortlist to the caller so the review sheet can show
+    // what was considered and why it scored as it did — including the runners
+    // up, which is the only way to tell a good pick from a lucky one.
+    if (onCandidates) {
+      onCandidates(`${entry.country}::${entry.category}`, {
+        country: entry.country,
+        category: entry.category,
+        provider: providerName,
+        searchQuery: entry.searchQuery,
+        considered: usable.length,
+        shortlist: scored.map((s) => ({
+          ...s.candidate,
+          score: s.total,
+          scoreParts: s.parts,
+          accepted: s.total >= ACCEPT_THRESHOLD,
+        })),
+      });
+    }
+
     if (!best) {
       attempts.push({
         provider: providerName,
@@ -234,7 +255,9 @@ export async function resolveAll(destinations, options) {
 
   const usedPhotoKeys = entryOpts.usedPhotoKeys ?? new Set();
   const records = [];
+  const candidates = {};
   const stats = { fromCache: 0, resolved: 0, unresolved: 0 };
+  const collect = (key, value) => { candidates[key] = value; };
 
   for (const destination of destinations) {
     log(`\n  ${destination.name}`);
@@ -255,6 +278,7 @@ export async function resolveAll(destinations, options) {
         ...entryOpts,
         usedPhotoKeys,
         log,
+        onCandidates: collect,
       });
       records.push(record);
       if (record.status === STATUS.RESOLVED) stats.resolved += 1;
@@ -264,7 +288,7 @@ export async function resolveAll(destinations, options) {
     }
   }
 
-  return { records, stats };
+  return { records, candidates, stats };
 }
 
 export { cacheKey };
