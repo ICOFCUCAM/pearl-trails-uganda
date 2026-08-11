@@ -2,23 +2,85 @@
 
 Gorilla and chimpanzee trekking, the savannah parks, the Nile at Jinja and the Rwenzori — a Ugandan ground operator's website.
 
-A five-page static site: home, services, pricing, about, contact. No build step, no
-dependencies, no framework — plain HTML and CSS. Deploy the folder as-is.
+Twenty pages of static HTML: home, services, pricing, about, contact, an East Africa
+overview and one tourism page for each of fourteen countries. Still no framework and no
+runtime dependencies — every page is committed HTML and CSS. Deploy the folder as-is.
+
+The only Node code in the repository is build-time tooling for the tourism image system
+(`tourism/`), which never ships to the browser.
 
 ## Deploying
 
 Import the repository into Vercel (or any static host) and deploy. There is nothing to
-configure: `vercel.json` sets `cleanUrls`, so `/services` serves `services.html`.
+configure: `vercel.json` sets `cleanUrls`, so `/services` serves `services.html` and
+`/destinations/uganda` serves `destinations/uganda.html`.
+
+## The East Africa tourism image system
+
+Fourteen countries plus a regional overview, each carrying the same twenty-seven tourism
+categories — 405 image slots in total. Photographs come from **Unsplash** (primary) and
+**Pexels** (fallback) through their official APIs.
+
+**The rule that shapes everything: no URL is ever invented.** Image URLs, photo ids,
+page links and photographer credits are taken verbatim from the API response. When
+neither provider returns a photograph that clears the ranking threshold, the slot is
+recorded as `unresolved` with the reason, renders as a typographic plate occupying the
+same box, and is reported by the audit. There is no code path that fabricates a CDN URL,
+guesses a photo id, or turns a page slug into an image path — and `npm run lint` fails
+the build if one is added.
+
+### Running it
+
+```sh
+cp .env.example .env      # add UNSPLASH_ACCESS_KEY and PEXELS_API_KEY
+npm run tourism:resolve-images    # hit the APIs, rank, cache, write the manifest
+npm run tourism:build-pages       # regenerate the HTML from the manifest
+npm run tourism:validate          # audit coverage, URLs, duplicates, alt text
+```
+
+`resolve-images` accepts `--country <slug>`, `--category <id>`, `--provider unsplash|pexels`,
+`--force` and `--dry-run`; all are repeatable where it makes sense. Resolution is cached
+for 90 days in `tourism/cache/`, so adding one country does not re-spend the API budget
+on the other thirteen. `build-pages` and `validate` never contact a provider — they read
+`tourism/manifest/tourism-images.json`, so a deploy cannot be broken by a provider outage.
+
+Keys are read only by the scripts, from the environment or `.env`. They are never written
+into a page; `tourism:validate` greps the built HTML to prove it.
+
+### Where things live
+
+| Path | What it is |
+| --- | --- |
+| `tourism/data/categories.js` | The 27 categories and their render roles (crop, width ladder, `sizes`) |
+| `tourism/data/countries/*.js` | One file per country: identity, signature place names, and 27 authored captions |
+| `tourism/lib/providers/` | Unsplash and Pexels API clients |
+| `tourism/lib/ranking.js` | Candidate scoring — country relevance, category fit, quality, crop, authenticity |
+| `tourism/lib/resolver.js` | Unsplash → Pexels → unresolved, with validation and caching |
+| `tourism/lib/render.js` | The shared components; there is no per-country component anywhere |
+| `styles/tourism.css` | The stylesheet the fifteen generated pages share |
+
+Adding a country is one data file plus one line in `tourism/data/countries/index.js`.
+Every other country then automatically learns to avoid its landmarks: a country's
+`signature` terms become every other country's negative terms, which is what stops
+"Uganda + Beaches" resolving to a Zanzibar photograph.
+
+### Changing a caption
+
+Edit the country's data file and run `npm run tourism:build-pages`. Authored copy is
+re-applied over the manifest on every load, so captions, descriptions and alt text change
+without re-hitting the API.
 
 ## Before this goes live
 
 Three things are placeholders, and all three are deliberate:
 
-**1. The photographs.** Every image is an SVG placeholder in `images/`, each labelled
-with the slot it fills (`hero`, `coverage.2`, `services-grid.1`, and so on). Drop a real
-photograph in at the same path — keep the filename, change the extension and update the
-`src` if you use `.jpg`. Eleven slots in total. Landscape, roughly 3:2, and at least
-1600px wide for the full-bleed bands.
+**1. The photographs.** The tourism system above owns every image slot, including the
+eleven on the five original pages — each is marked with `data-tourism="uganda/<category>"`
+and takes its photograph automatically on the next `tourism:build-pages` once that slot
+resolves. Until then those five pages keep their labelled SVG placeholders (they carry
+their CSS inline and do not link the tourism stylesheet), and the generated destination
+pages show pending plates that reserve the exact box the photograph will occupy.
+`npm run tourism:validate` reports both states, so nothing goes live unnoticed.
 
 **2. The contact details.** Phone numbers, addresses, opening hours, licence numbers and
 the trails@pearltrails.co.ug address are illustrative. Search the HTML and replace them.
@@ -33,8 +95,10 @@ Prices, itineraries and figures are illustrative too. Check them before publishi
 
 ## The fixed-window bands
 
-The home page has two **fixed-window bands**: the photograph locks to the viewport and
-the section travels across it like a window. It is CSS only, no JavaScript.
+The home page has two **fixed-window bands**, and each generated destination page has
+three: the photograph locks to the viewport and the section travels across it like a
+window. It is CSS only, no JavaScript. Below 1000px the picture stops being fixed
+altogether rather than shipping a second image for mobile.
 
 The construction is fragile in one specific way. The section clips its own fixed child
 with `clip-path: inset(0)`, but the section must never become that child's *containing
@@ -43,6 +107,9 @@ block* — so **do not add `transform`, `filter`, `backdrop-filter`, `perspectiv
 `<html>`. Any one of those turns `fixed` into `absolute`: the photograph starts scrolling
 with the page, nothing errors, and the effect is silently gone. `background-attachment:
 fixed` is not a substitute — iOS Safari ignores it.
+
+`npm run lint` enforces this: it parses every CSS rule whose selector sits on the chain
+down to the fixed picture and fails if one of those properties appears.
 
 The scrim lives inside the picture, not on the band, and is a tint rather than a
 blackout, so the photograph keeps its own light.
