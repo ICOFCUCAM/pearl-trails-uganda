@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Itineraries & Experiences — Bwindi, the Nile, the Rwenzori | Pearl Trails Uganda</title>
+<meta name="description" content="Multi-day Uganda itineraries written day by day with measured driving distances: Bwindi and the crater road, the Nile and northern savannah, the Rwenzori Central Circuit, plus gorilla habituation, shoebill birding, rafting and day trips from Kampala.">
+<style>
+:root{
+  /* master tokens (rebrandable) — equatorial-fieldbook: papyrus stock, forest ink, crater-lake teal */
+  --c-bg:#F5F3EC;
+  --c-primary:#12312A;
+  --c-accent:#0E6E62;
+  --c-ink:#1A2420;
+  --c-muted:#6B7A72;
+  --c-border:#DCD8CA;
+  /* derived surfaces */
+  --ptu-stock:color-mix(in srgb,var(--c-bg) 94%,var(--c-primary));
+  --ptu-card:color-mix(in srgb,var(--c-bg) 88%,var(--c-primary));
+  --ptu-wash:color-mix(in srgb,var(--c-accent) 9%,var(--c-bg));
+  --ptu-deep:color-mix(in srgb,var(--c-primary) 92%,#000);
+  --ptu-rule:1px solid var(--c-border);
+  --ptu-face:"Helvetica Neue",Helvetica,Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --ptu-num:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  /* photograph-relative values: these sit ON imagery, so they are tuned to the picture
+     rather than to the brand palette and stay legible whatever photo is dropped in */
+  --ptu-shade:#0D1512;
+  --ptu-onphoto:#FCFAF4;
+  --ptu-onphoto-soft:#F1ECE0;
+  --ptu-onphoto-dim:#E8E1D0;
+  color-scheme:light;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--ptu-face);background:var(--c-bg);color:var(--c-ink);font-size:16.5px;line-height:1.66;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,h4{font-weight:600;line-height:1.06;letter-spacing:-.022em;text-wrap:balance}
+p{margin:0}
+ul,ol{list-style:none}
+::selection{background:var(--c-primary);color:var(--c-bg)}
+
+.ptu-frame{max-width:1240px;margin:0 auto;padding:0 44px}
+.ptu-tag{display:block;font-family:var(--ptu-num);font-size:11px;letter-spacing:.19em;text-transform:uppercase;color:var(--c-accent)}
+.ptu-tag i{font-style:normal;color:var(--c-muted)}
+.ptu-hr{border:0;border-top:var(--ptu-rule);margin:0}
+
+/* reveal — never applied to a fixed-window band or to any ancestor of one */
+.ptu-lift{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+.ptu-lift.seen{opacity:1;transform:none}
+
+/* ---- masthead ---------------------------------------------------------------- */
+.ptu-mast{position:sticky;top:0;z-index:70;background:var(--c-bg);border-bottom:2px solid var(--c-primary)}
+.ptu-mast-in{display:flex;align-items:center;gap:34px;padding:15px 0}
+.ptu-mark{margin-right:auto;font-size:21px;font-weight:600;letter-spacing:-.02em;line-height:1.1;display:flex;align-items:baseline;gap:9px}
+.ptu-mark em{font-style:normal;font-family:var(--ptu-num);font-size:10.5px;font-weight:400;letter-spacing:.26em;text-transform:uppercase;color:var(--c-accent)}
+.ptu-routes{display:flex;gap:26px}
+.ptu-routes a{font-family:var(--ptu-num);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-muted);padding:4px 0;border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
+.ptu-routes a:hover{color:var(--c-primary);border-bottom-color:var(--c-accent)}
+.ptu-lic{font-family:var(--ptu-num);font-size:10.5px;letter-spacing:.14em;color:var(--c-muted);border:var(--ptu-rule);padding:5px 9px}
+.btn{font-family:var(--ptu-num);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--c-bg);background:var(--c-primary);padding:12px 20px;transition:background .2s}
+.btn:hover{background:var(--c-accent)}
+@media(max-width:1000px){.ptu-routes,.ptu-lic{display:none}}
+@media(max-width:560px){
+  .ptu-frame{padding:0 22px}
+  .ptu-mast-in{gap:12px;padding:12px 0}
+  .ptu-mark{font-size:18px;flex-direction:column;gap:2px}
+  .btn{padding:10px 13px;font-size:10px;letter-spacing:.1em;white-space:nowrap}
+}
+
+/* ---- opening ------------------------------------------------------------------ */
+.ptu-open{padding:76px 0 0}
+.ptu-open h1{font-size:clamp(38px,5.9vw,80px);margin:22px 0 0;max-width:17ch}
+.ptu-open h1 em{font-style:normal;color:var(--c-accent)}
+.ptu-open-two{display:grid;grid-template-columns:1.25fr .75fr;gap:56px;align-items:end;margin-top:30px}
+.ptu-lede{font-size:18px;color:var(--c-muted);max-width:44em}
+.ptu-acts{display:flex;flex-wrap:wrap;gap:14px 26px;align-items:center;margin-top:28px}
+.ptu-go{display:inline-block;font-family:var(--ptu-num);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;padding:11px 0 6px;border-bottom:2px solid var(--c-primary);transition:color .2s,border-color .2s}
+.ptu-go:hover{color:var(--c-accent);border-bottom-color:var(--c-accent)}
+.ptu-go.faint{border-bottom-color:var(--c-border);color:var(--c-muted)}
+.ptu-go.faint:hover{color:var(--c-primary);border-bottom-color:var(--c-primary)}
+.ptu-stack{border-top:2px solid var(--c-primary)}
+.ptu-stack div{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:baseline;padding:11px 0;border-bottom:var(--ptu-rule)}
+.ptu-stack dt{font-family:var(--ptu-num);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--c-muted)}
+.ptu-stack dd{font-family:var(--ptu-num);font-size:15px;color:var(--c-primary)}
+.ptu-plate{margin-top:60px}
+.ptu-plate img{width:100%;height:clamp(280px,44vw,540px);object-fit:cover}
+.ptu-plate-cap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px;padding-top:12px;font-family:var(--ptu-num);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-muted)}
+.ptu-plate-cap i{font-style:normal;color:var(--c-accent)}
+.ptu-marks{display:grid;grid-template-columns:repeat(4,1fr);border-top:var(--ptu-rule);margin-top:54px}
+.ptu-mrk{padding:24px 26px 30px 0}
+.ptu-mrk b{display:block;font-family:var(--ptu-num);font-size:31px;font-weight:400;color:var(--c-primary);letter-spacing:-.02em}
+.ptu-mrk span{display:block;font-size:13.5px;color:var(--c-muted);margin-top:8px;max-width:22em}
+@media(max-width:900px){.ptu-open{padding:52px 0 0}.ptu-open-two{grid-template-columns:1fr;gap:34px;align-items:start}.ptu-marks{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.ptu-marks{grid-template-columns:1fr}.ptu-mrk{padding:18px 0 20px;border-bottom:var(--ptu-rule)}}
+
+/* ============================================================================
+   FIXED-WINDOW BANDS (.ptu-still) — TWO of them, both on the home page.
+   The photograph is pinned to the viewport; the section is a window travelling
+   across it. clip-path keeps the fixed child inside the band — but nothing
+   between the picture and <html> may create a containing block, so never add
+   transform, filter, backdrop-filter, perspective, will-change or contain to
+   .ptu-still, .ptu-still-pic, or any ancestor: `fixed` would silently degrade to
+   `absolute` and the effect would die with no error. Do not put .ptu-lift (a
+   transform) on a band. background-attachment:fixed is not a substitute — iOS
+   ignores it. No script drives these. Verified by `npm run test:fixedwindow`.
+   ========================================================================== */
+.ptu-still{position:relative;clip-path:inset(0);min-height:130svh;display:flex;align-items:center}
+.ptu-still-pic{position:fixed;inset:0;z-index:0}
+.ptu-still-pic img{width:100%;height:100%;object-fit:cover}
+.ptu-still-veil{position:absolute;inset:0}
+.ptu-still-copy{position:relative;z-index:1;width:100%;max-width:1240px;margin:0 auto;padding:0 44px;color:var(--ptu-onphoto)}
+.ptu-still-in{max-width:560px}
+.ptu-still-eye{display:block;font-family:var(--ptu-num);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ptu-onphoto-dim)}
+.ptu-still-copy h2{font-size:clamp(34px,4.9vw,64px);margin:18px 0 20px;color:var(--ptu-onphoto)}
+.ptu-still-copy h2 em{font-style:normal;border-bottom:2px solid color-mix(in srgb,var(--ptu-onphoto) 52%,transparent);padding-bottom:2px}
+.ptu-still-copy p{font-size:17.5px;color:var(--ptu-onphoto-soft);max-width:42ch}
+.ptu-still-foot{display:block;margin-top:24px;padding-top:14px;border-top:1px solid color-mix(in srgb,var(--ptu-onphoto) 34%,transparent);font-family:var(--ptu-num);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ptu-onphoto-dim)}
+
+/* band one — raking side veil, copy hung on the left margin */
+.ptu-still--forest .ptu-still-veil{background:linear-gradient(105deg,
+  color-mix(in srgb,var(--ptu-shade) 90%,transparent) 0%,
+  color-mix(in srgb,var(--ptu-shade) 86%,transparent) 38%,
+  color-mix(in srgb,var(--ptu-shade) 80%,transparent) 52%,
+  color-mix(in srgb,var(--ptu-shade) 40%,transparent) 66%,
+  color-mix(in srgb,var(--ptu-shade) 12%,transparent) 100%)}
+
+/* band two — a cross: a shaded beam across the middle of the frame meeting a
+   shaded column on the right, so all four corners of the photograph stay open */
+.ptu-still--rift .ptu-still-veil{background:
+  linear-gradient(to left,
+    color-mix(in srgb,var(--ptu-shade) 86%,transparent) 0%,
+    color-mix(in srgb,var(--ptu-shade) 82%,transparent) 30%,
+    color-mix(in srgb,var(--ptu-shade) 72%,transparent) 52%,
+    color-mix(in srgb,var(--ptu-shade) 26%,transparent) 70%,
+    color-mix(in srgb,var(--ptu-shade) 8%,transparent) 100%),
+  linear-gradient(to bottom,
+    color-mix(in srgb,var(--ptu-shade) 6%,transparent) 0%,
+    color-mix(in srgb,var(--ptu-shade) 14%,transparent) 12%,
+    color-mix(in srgb,var(--ptu-shade) 40%,transparent) 20%,
+    color-mix(in srgb,var(--ptu-shade) 40%,transparent) 80%,
+    color-mix(in srgb,var(--ptu-shade) 14%,transparent) 88%,
+    color-mix(in srgb,var(--ptu-shade) 6%,transparent) 100%)}
+.ptu-still--rift .ptu-still-copy{display:flex;justify-content:flex-end}
+.ptu-still--rift .ptu-still-in{text-align:right}
+.ptu-still--rift .ptu-still-copy h2,.ptu-still--rift .ptu-still-copy p{margin-left:auto}
+.ptu-log{margin-top:26px;border-top:1px solid color-mix(in srgb,var(--ptu-onphoto) 34%,transparent)}
+.ptu-log li{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:baseline;padding:9px 0;border-bottom:1px solid color-mix(in srgb,var(--ptu-onphoto) 20%,transparent)}
+/* the run label and the figure inherit their colour from the row: the contrast
+   verifier hides a measured element by setting `color:transparent` on it, and a
+   child with its own colour rule would survive that and pollute the reading */
+.ptu-log b{font-weight:500;font-size:14.5px}
+.ptu-log i{font-style:normal;font-family:var(--ptu-num);font-size:13.5px;letter-spacing:.04em}
+@media(max-width:1000px){
+  .ptu-still--forest .ptu-still-veil,.ptu-still--rift .ptu-still-veil{background:linear-gradient(172deg,
+    color-mix(in srgb,var(--ptu-shade) 46%,transparent) 0%,
+    color-mix(in srgb,var(--ptu-shade) 78%,transparent) 18%,
+    color-mix(in srgb,var(--ptu-shade) 86%,transparent) 50%,
+    color-mix(in srgb,var(--ptu-shade) 80%,transparent) 84%,
+    color-mix(in srgb,var(--ptu-shade) 48%,transparent) 100%)}
+  .ptu-still-copy{padding:0 26px}
+  .ptu-still-copy h2{font-size:clamp(28px,5.6vw,42px);margin:14px 0 16px}
+  .ptu-still-copy p{font-size:16.5px}
+  .ptu-still--rift .ptu-still-copy{justify-content:flex-start}
+  .ptu-still--rift .ptu-still-in{text-align:left}
+  .ptu-still--rift .ptu-still-copy h2,.ptu-still--rift .ptu-still-copy p{margin-left:0}
+}
+
+/* ---- slabs (general section shell) -------------------------------------------- */
+.ptu-slab{padding:104px 0}
+.ptu-slab.short{padding:72px 0}
+.ptu-slab.stock{background:var(--ptu-stock)}
+.ptu-slab.wash{background:var(--ptu-wash)}
+.ptu-head{display:grid;grid-template-columns:74px minmax(0,1.2fr) minmax(0,.8fr);gap:40px;align-items:start;padding-top:22px;border-top:2px solid var(--c-primary);margin-bottom:54px}
+.ptu-head-no{font-family:var(--ptu-num);font-size:12px;letter-spacing:.1em;color:var(--c-accent);padding-top:6px}
+.ptu-head h2{font-size:clamp(28px,3.5vw,45px);max-width:18ch}
+.ptu-head h2 em{font-style:normal;color:var(--c-accent)}
+.ptu-head-note{color:var(--c-muted);font-size:15.5px;padding-top:6px}
+@media(max-width:920px){.ptu-slab{padding:70px 0}.ptu-head{grid-template-columns:1fr;gap:16px;margin-bottom:38px}.ptu-head-no{padding-top:0}}
+
+/* ---- routes (itineraries) ------------------------------------------------------ */
+.ptu-routes-list{display:grid;gap:34px}
+.ptu-route{border:var(--ptu-rule);background:var(--c-bg);display:grid;grid-template-columns:.86fr 1.14fr}
+.ptu-route-pic img{width:100%;height:100%;min-height:260px;object-fit:cover}
+.ptu-route-body{padding:32px 34px 34px}
+.ptu-route-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;align-items:baseline;border-bottom:var(--ptu-rule);padding-bottom:14px}
+.ptu-route-top h3{font-size:26px}
+.ptu-route-top span{font-family:var(--ptu-num);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-accent)}
+.ptu-route-body>p{color:var(--c-muted);font-size:15.5px;margin-top:16px;max-width:46em}
+.ptu-days{margin-top:20px}
+.ptu-days li{display:grid;grid-template-columns:62px 1fr;gap:18px;padding:10px 0;border-bottom:var(--ptu-rule);font-size:15px}
+.ptu-days li:last-child{border-bottom:0}
+.ptu-days b{font-family:var(--ptu-num);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--c-muted);padding-top:3px;font-weight:400}
+.ptu-days span{color:var(--c-ink)}
+.ptu-days span i{font-style:normal;display:block;color:var(--c-muted);font-size:14px;margin-top:2px}
+.ptu-route-foot{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:baseline;margin-top:22px;padding-top:16px;border-top:2px solid var(--c-primary)}
+.ptu-route-foot b{font-family:var(--ptu-num);font-size:20px;font-weight:400;color:var(--c-primary)}
+.ptu-route-foot em{font-style:normal;font-size:13.5px;color:var(--c-muted)}
+@media(max-width:900px){.ptu-route{grid-template-columns:1fr}.ptu-route-pic img{min-height:0;height:clamp(200px,42vw,300px)}.ptu-route-body{padding:24px 22px 26px}}
+
+/* ---- tiles (parks / places) ---------------------------------------------------- */
+.ptu-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.ptu-tile img{width:100%;aspect-ratio:4/5;object-fit:cover}
+.ptu-tile b{display:block;font-size:19px;font-weight:600;margin-top:16px}
+.ptu-tile-co{display:block;font-family:var(--ptu-num);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-accent);margin-top:6px}
+.ptu-tile p{font-size:14.5px;color:var(--c-muted);margin-top:10px}
+@media(max-width:920px){.ptu-tiles{grid-template-columns:1fr 1fr;gap:24px}}
+@media(max-width:520px){.ptu-tiles{grid-template-columns:1fr}}
+
+/* ---- strip (wide still, not fixed) --------------------------------------------- */
+.ptu-strip img{width:100%;height:min(58vh,520px);object-fit:cover}
+.ptu-strip-cap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 22px;max-width:1240px;margin:0 auto;padding:12px 44px 0;font-family:var(--ptu-num);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-muted)}
+.ptu-strip-cap i{font-style:normal;color:var(--c-accent)}
+@media(max-width:560px){.ptu-strip-cap{padding:12px 22px 0}}
+
+/* ---- calendar / season grid ----------------------------------------------------- */
+.ptu-cal{display:grid;grid-template-columns:repeat(4,1fr);border-top:2px solid var(--c-primary)}
+.ptu-mo{padding:22px 24px 26px 0;border-right:var(--ptu-rule)}
+.ptu-mo:last-child{border-right:0}
+.ptu-mo b{display:block;font-family:var(--ptu-num);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-accent)}
+.ptu-mo h3{font-size:20px;margin:12px 0 8px}
+.ptu-mo p{font-size:14.5px;color:var(--c-muted)}
+.ptu-mo-flag{display:inline-block;margin-top:14px;font-family:var(--ptu-num);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--c-primary);background:var(--ptu-card);padding:4px 8px}
+@media(max-width:920px){.ptu-cal{grid-template-columns:1fr 1fr}.ptu-mo{padding-right:20px}}
+@media(max-width:520px){.ptu-cal{grid-template-columns:1fr}.ptu-mo{border-right:0;border-bottom:var(--ptu-rule);padding:20px 0}}
+
+/* ---- ledger (rates, permits, inclusions) ----------------------------------------- */
+.ptu-ledger{border-top:2px solid var(--c-primary)}
+.ptu-ledger li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) auto;gap:14px 30px;align-items:baseline;padding:15px 0;border-bottom:var(--ptu-rule)}
+.ptu-ledger b{font-size:16.5px;font-weight:600}
+.ptu-ledger span{font-size:14.5px;color:var(--c-muted)}
+.ptu-ledger i{font-style:normal;font-family:var(--ptu-num);font-size:16px;color:var(--c-primary);white-space:nowrap;text-align:right}
+@media(max-width:760px){.ptu-ledger li{grid-template-columns:1fr auto;gap:4px 16px}.ptu-ledger span{grid-column:1/-1}}
+
+.ptu-gap{margin-top:56px}
+.ptu-splits{display:grid;grid-template-columns:1fr 1fr;gap:0 60px}
+.ptu-split h3{font-size:20px;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid var(--c-primary)}
+.ptu-split li{padding:11px 0;border-bottom:var(--ptu-rule);font-size:15px;color:var(--c-muted)}
+.ptu-split li b{color:var(--c-ink);font-weight:600}
+@media(max-width:820px){.ptu-splits{grid-template-columns:1fr;gap:38px}}
+
+/* ---- fare cards ------------------------------------------------------------------ */
+.ptu-fares{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:2px solid var(--c-primary)}
+.ptu-fare{padding:30px 30px 34px;border-right:var(--ptu-rule);display:flex;flex-direction:column}
+.ptu-fare:last-child{border-right:0}
+.ptu-fare.mark{background:var(--ptu-wash)}
+.ptu-fare h3{font-size:23px;margin-bottom:6px}
+.ptu-fare-when{font-family:var(--ptu-num);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-accent)}
+.ptu-fare-sum{font-family:var(--ptu-num);font-size:36px;color:var(--c-primary);margin:22px 0 2px;letter-spacing:-.02em}
+.ptu-fare-sum small{display:block;font-family:var(--ptu-face);font-size:12.5px;letter-spacing:0;text-transform:none;color:var(--c-muted);margin-top:8px}
+.ptu-fare ul{margin:22px 0 26px;border-top:var(--ptu-rule)}
+.ptu-fare li{padding:10px 0;border-bottom:var(--ptu-rule);font-size:14.5px;color:var(--c-muted)}
+.ptu-fare .ptu-go{margin-top:auto;align-self:flex-start}
+@media(max-width:960px){.ptu-fares{grid-template-columns:1fr}.ptu-fare{border-right:0;border-bottom:var(--ptu-rule);padding:26px 0 30px}}
+
+/* ---- steps ------------------------------------------------------------------------ */
+.ptu-steps{display:grid;grid-template-columns:repeat(4,1fr);border-top:var(--ptu-rule)}
+.ptu-step{padding:26px 28px 0 0}
+.ptu-step b{display:block;font-family:var(--ptu-num);font-size:12px;letter-spacing:.14em;color:var(--c-accent)}
+.ptu-step h3{font-size:19px;margin:12px 0 8px}
+.ptu-step p{font-size:14.5px;color:var(--c-muted)}
+@media(max-width:900px){.ptu-steps{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.ptu-steps{grid-template-columns:1fr}.ptu-step{padding:20px 0 8px}}
+
+/* ---- voices -------------------------------------------------------------------- */
+.ptu-voices{display:grid;grid-template-columns:repeat(3,1fr);gap:0 44px}
+.ptu-voice{border-top:2px solid var(--c-primary);padding-top:24px}
+.ptu-voice p{font-size:17px;line-height:1.55}
+.ptu-voice span{display:block;margin-top:18px;font-family:var(--ptu-num);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-muted)}
+.ptu-voice span i{font-style:normal;color:var(--c-accent)}
+@media(max-width:880px){.ptu-voices{grid-template-columns:1fr;gap:32px}}
+
+/* ---- prose / crew / log ---------------------------------------------------------- */
+.ptu-prose{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+.ptu-prose p{color:var(--c-muted)}
+.ptu-prose p+p{margin-top:18px}
+.ptu-prose .ptu-open-line{font-size:22px;line-height:1.45;color:var(--c-ink);font-weight:500}
+@media(max-width:880px){.ptu-prose{grid-template-columns:1fr;gap:26px}}
+
+.ptu-crew{display:grid;grid-template-columns:repeat(4,1fr);gap:30px}
+.ptu-crew img{width:100%;aspect-ratio:1/1;object-fit:cover}
+.ptu-crew b{display:block;font-size:18px;margin-top:16px}
+.ptu-crew span{display:block;font-family:var(--ptu-num);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-accent);margin-top:6px}
+.ptu-crew p{font-size:14.5px;color:var(--c-muted);margin-top:10px}
+@media(max-width:900px){.ptu-crew{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.ptu-crew{grid-template-columns:1fr}}
+
+.ptu-years{border-top:2px solid var(--c-primary)}
+.ptu-year{display:grid;grid-template-columns:110px 1fr;gap:30px;padding:22px 0;border-bottom:var(--ptu-rule)}
+.ptu-year b{font-family:var(--ptu-num);font-size:19px;font-weight:400;color:var(--c-accent)}
+.ptu-year h3{font-size:19px;margin-bottom:6px}
+.ptu-year p{color:var(--c-muted);font-size:15px;max-width:56em}
+@media(max-width:640px){.ptu-year{grid-template-columns:1fr;gap:6px}}
+
+/* ---- questions -------------------------------------------------------------------- */
+.ptu-asks{display:grid;grid-template-columns:1fr 1fr;gap:0 56px}
+.ptu-ask{border-top:var(--ptu-rule);padding:22px 0 20px}
+.ptu-ask h3{font-size:18px;margin-bottom:8px}
+.ptu-ask p{color:var(--c-muted);font-size:15px}
+@media(max-width:820px){.ptu-asks{grid-template-columns:1fr}}
+
+/* ---- enquiry desk -------------------------------------------------------------- */
+.ptu-desk{display:grid;grid-template-columns:.82fr 1.18fr;gap:64px;align-items:start}
+.ptu-desk h2{font-size:clamp(27px,3.3vw,42px);margin:16px 0 16px;max-width:15ch}
+.ptu-desk-note{color:var(--c-muted);max-width:32em}
+.ptu-facts{margin-top:28px;border-top:2px solid var(--c-primary)}
+.ptu-facts div{display:grid;grid-template-columns:118px 1fr;gap:16px;padding:13px 0;border-bottom:var(--ptu-rule);font-size:15px}
+.ptu-facts dt{font-family:var(--ptu-num);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-muted);padding-top:4px}
+.ptu-form{background:var(--ptu-card);border:var(--ptu-rule);padding:34px 34px 30px}
+.ptu-duo{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.ptu-in{margin-bottom:18px}
+.ptu-in label{display:block;font-family:var(--ptu-num);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-muted);margin-bottom:7px}
+.ptu-in input,.ptu-in select,.ptu-in textarea{width:100%;font-family:inherit;font-size:16px;color:var(--c-ink);background:var(--c-bg);border:var(--ptu-rule);padding:11px 13px;transition:border-color .2s}
+.ptu-in textarea{resize:vertical}
+.ptu-in input:focus,.ptu-in select:focus,.ptu-in textarea:focus{outline:none;border-color:var(--c-accent)}
+.ptu-send{font-family:var(--ptu-num);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--c-bg);background:var(--c-primary);border:0;padding:14px 28px;cursor:pointer;transition:background .2s}
+.ptu-send:hover{background:var(--c-accent)}
+.ptu-small{margin-top:14px;font-size:13px;color:var(--c-muted)}
+.ptu-msg{display:none;margin-top:13px;font-size:14.5px;padding:11px 13px;border-left:3px solid var(--c-accent);background:var(--c-bg);color:var(--c-ink)}
+.ptu-msg.on{display:block}
+@media(max-width:900px){.ptu-desk{grid-template-columns:1fr;gap:34px}.ptu-duo{grid-template-columns:1fr;gap:0}.ptu-form{padding:26px 20px 24px}}
+
+/* ---- footer ---------------------------------------------------------------------- */
+.ptu-foot{background:var(--ptu-deep);color:color-mix(in srgb,var(--c-bg) 80%,var(--c-primary));padding:66px 0 0}
+.ptu-foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1.15fr;gap:40px}
+.ptu-foot-mark{font-size:22px;font-weight:600;color:var(--c-bg);letter-spacing:-.02em}
+.ptu-foot-mark span{display:block;font-family:var(--ptu-num);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:color-mix(in srgb,var(--c-accent) 70%,var(--c-bg));margin-top:7px}
+.ptu-foot-grid p{margin-top:16px;font-size:14.5px;max-width:34em;color:color-mix(in srgb,var(--c-bg) 68%,var(--c-primary))}
+.ptu-foot-col b{display:block;font-family:var(--ptu-num);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:color-mix(in srgb,var(--c-accent) 70%,var(--c-bg));margin-bottom:14px;font-weight:400}
+.ptu-foot-col a,.ptu-foot-col span{display:block;font-size:14.5px;padding:4px 0;color:color-mix(in srgb,var(--c-bg) 76%,var(--c-primary));transition:color .2s}
+.ptu-foot-col a:hover{color:var(--c-bg)}
+.ptu-foot-bar{margin-top:50px;padding:20px 0;border-top:1px solid color-mix(in srgb,var(--c-bg) 16%,transparent);font-family:var(--ptu-num);font-size:11px;letter-spacing:.08em;color:color-mix(in srgb,var(--c-bg) 58%,var(--c-primary))}
+.ptu-foot-bar em{font-style:normal;color:color-mix(in srgb,var(--c-accent) 70%,var(--c-bg))}
+@media(max-width:900px){.ptu-foot-grid{grid-template-columns:1fr 1fr;gap:30px}}
+@media(max-width:560px){.ptu-foot-grid{grid-template-columns:1fr}}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition-duration:.001ms !important;animation-duration:.001ms !important;animation-iteration-count:1 !important}
+  .ptu-lift{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<!-- nav -->
+<header class="ptu-mast">
+  <div class="ptu-frame ptu-mast-in">
+    <a class="ptu-mark" href="/">Pearl Trails<em>Uganda</em></a>
+    <nav class="ptu-routes">
+      <a href="/services">Itineraries</a>
+      <a href="/pricing">Rates &amp; Permits</a>
+      <a href="/about">The Operator</a>
+      <a href="/contact">Enquire</a>
+    </nav>
+    <span class="ptu-lic">UTB TO/1147</span>
+    <a class="btn" href="#quote">Plan a trip</a>
+  </div>
+</header>
+<!-- lead -->
+<section class="ptu-open">
+  <div class="ptu-frame">
+    <div class="ptu-lift seen">
+      <span class="ptu-tag">Itineraries &amp; experiences <i>&middot; multi-day and single-day</i></span>
+      <h1>Everything below is a <em>routing we drive</em>, not a package we resell.</h1>
+    </div>
+    <div class="ptu-open-two">
+      <div class="ptu-lift seen">
+        <p class="ptu-lede">Six standing itineraries, a shelf of single-day trips out of Kampala and Entebbe, and the specialist permits that people fly here for. Any of them can be lengthened, shortened or joined together &mdash; what cannot move is a gorilla permit, which is dated, named and non-transferable.</p>
+        <div class="ptu-acts">
+          <a class="ptu-go" href="/pricing">What it costs</a>
+          <a class="ptu-go faint" href="#quote">Ask for a draft routing</a>
+        </div>
+      </div>
+      <dl class="ptu-stack ptu-lift">
+        <div><dt>Shortest itinerary</dt><dd>3 days</dd></div>
+        <div><dt>Longest we run</dt><dd>17 days</dd></div>
+        <div><dt>Parks covered</dt><dd>10</dd></div>
+        <div><dt>Private departures</dt><dd>Every day</dd></div>
+      </dl>
+    </div>
+    <figure class="ptu-plate ptu-lift">
+      <img src="/images/hero.1.svg" alt="A Land Cruiser on a murram road climbing between tea estates in western Uganda">
+      <figcaption class="ptu-plate-cap"><span>The Kabale road above the tea <i>&middot; 2,100 m</i></span><span>Private departures &middot; no seat-in-coach, no group joining</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- circuits -->
+<section class="ptu-slab">
+  <div class="ptu-frame">
+    <div class="ptu-head ptu-lift">
+      <span class="ptu-head-no">01</span>
+      <h2>The multi-day circuits, <em>day by day</em>.</h2>
+      <p class="ptu-head-note">Driving distances are measured, not estimated. Where a day looks short it is because the road is bad, and where it looks long it is because the road is good.</p>
+    </div>
+    <div class="ptu-routes-list">
+      <article class="ptu-route ptu-lift">
+        <div class="ptu-route-pic"><img src="/images/services.1.svg" alt="A silverback mountain gorilla in the undergrowth of the Bwindi forest" loading="lazy"></div>
+        <div class="ptu-route-body">
+          <div class="ptu-route-top"><h3>Bwindi &amp; the Crater Road</h3><span>8 days &middot; 1,480 km</span></div>
+          <p>Our most requested routing and the one we would put a first-time visitor on. Primates at both ends, savannah in the middle, and the crater field between Fort Portal and Kibale that nobody expects.</p>
+          <ul class="ptu-days">
+            <li><b>Day 1</b><span>Entebbe arrival<i>Met at the airport, one night on the lake shore, itinerary walked through over dinner</i></span></li>
+            <li><b>Day 2</b><span>Lake Mburo, 240 km<i>Equator crossing, afternoon game drive, optional walking safari with a ranger</i></span></li>
+            <li><b>Day 3</b><span>Mburo to Bwindi, 280 km<i>Five hours through Kabale and the terraces, arriving in time for the briefing sheet</i></span></li>
+            <li><b>Day 4</b><span>Gorilla trek<i>Registration 07:00, trek two to seven hours, one hour with the family, porters arranged</i></span></li>
+            <li><b>Day 5</b><span>Bwindi rest or second permit<i>Batwa forest experience, the Ride 4 a Woman workshop, or a second trek if booked</i></span></li>
+            <li><b>Day 6</b><span>Ishasha and Queen Elizabeth, 160 km<i>Southern sector for the tree-climbing lions, north to the channel for the night</i></span></li>
+            <li><b>Day 7</b><span>Kazinga Channel to Kibale, 190 km<i>Morning launch, afternoon transfer past the craters to Fort Portal</i></span></li>
+            <li><b>Day 8</b><span>Chimpanzee trek, return 320 km<i>Kanyanchu 08:00 briefing, Bigodi wetland, evening arrival at Entebbe</i></span></li>
+          </ul>
+          <div class="ptu-route-foot"><b>From USD 2,640</b><em>per person sharing, four travelling</em><a class="ptu-go faint" href="/pricing">Rates and permits</a></div>
+        </div>
+      </article>
+      <article class="ptu-route ptu-lift">
+        <div class="ptu-route-pic"><img src="/images/services.2.svg" alt="The Nile pushing through the narrow gorge at Murchison Falls" loading="lazy"></div>
+        <div class="ptu-route-body">
+          <div class="ptu-route-top"><h3>The Nile &amp; Northern Savannah</h3><span>6 days &middot; 940 km</span></div>
+          <p>For travellers with a week and a preference for water. Rhino on foot, the falls from below, and the source at Jinja either at speed or entirely at rest.</p>
+          <ul class="ptu-days">
+            <li><b>Day 1</b><span>Kampala to Ziwa, 176 km<i>Rhino tracking on foot with the sanctuary rangers, on to Masindi for the night</i></span></li>
+            <li><b>Day 2</b><span>Into Murchison, 135 km<i>Budongo forest edge, the top of the falls on foot, ferry across to the north bank</i></span></li>
+            <li><b>Day 3</b><span>Buligi circuit and launch<i>Dawn game drive for giraffe and hartebeest, afternoon boat to the base of the gorge</i></span></li>
+            <li><b>Day 4</b><span>Murchison to Jinja, 380 km<i>The long transfer of the trip, broken at Luwero, arriving before dark</i></span></li>
+            <li><b>Day 5</b><span>Source of the Nile<i>Grade V rafting with our licensed partner, or a source cruise and the Bujagali walk</i></span></li>
+            <li><b>Day 6</b><span>Jinja to Entebbe, 130 km<i>Mabira forest stop if the flight is late, otherwise straight to the airport</i></span></li>
+          </ul>
+          <div class="ptu-route-foot"><b>From USD 1,980</b><em>per person sharing, four travelling</em><a class="ptu-go faint" href="/pricing">Rates and permits</a></div>
+        </div>
+      </article>
+      <article class="ptu-route ptu-lift">
+        <div class="ptu-route-pic"><img src="/images/services.3.svg" alt="Glaciated rock and moorland high on the Rwenzori central circuit" loading="lazy"></div>
+        <div class="ptu-route-body">
+          <div class="ptu-route-top"><h3>Rwenzori Central Circuit</h3><span>9 days &middot; 5,109 m</span></div>
+          <p>A genuine mountaineering week with a summit day on ice. We run it with Rwenzori Mountaineering Services guides and cap the party at six climbers so the Elena hut does not become a queue.</p>
+          <ul class="ptu-days">
+            <li><b>Day 1&ndash;2</b><span>Kampala to Nyakalengija, 380 km<i>Kit inspection, hire of boots, gaiters and harness, park registration</i></span></li>
+            <li><b>Day 3</b><span>To Nyabitaba, 1,000 m gain<i>Through the bamboo, first night at 2,650 m, the Rwenzori turaco if you are lucky</i></span></li>
+            <li><b>Day 4&ndash;5</b><span>John Matte and Bujuku<i>The Bigo bog on duckboard, giant lobelia, camp under Mount Speke</i></span></li>
+            <li><b>Day 6</b><span>Elena hut, 4,541 m<i>Short stage, long acclimatisation, rope and crampon drill in the afternoon</i></span></li>
+            <li><b>Day 7</b><span>Margherita Peak<i>Alpine start at 02:00, Stanley plateau, summit and down to Kitandara the same day</i></span></li>
+            <li><b>Day 8&ndash;9</b><span>Guy Yeoman and out<i>Freshfield pass, the long muddy descent, back in Kasese by mid-afternoon</i></span></li>
+          </ul>
+          <div class="ptu-route-foot"><b>From USD 2,450</b><em>per person &middot; climb fees and porters included</em><a class="ptu-go faint" href="/pricing">Rates and permits</a></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- experiences -->
+<section class="ptu-slab stock">
+  <div class="ptu-frame">
+    <div class="ptu-head ptu-lift">
+      <span class="ptu-head-no">02</span>
+      <h2>The experiences people <em>fly here for</em>.</h2>
+      <p class="ptu-head-note">Each of these is a permit or a booked activity that slots into any routing. Numbers are set by the Uganda Wildlife Authority, not by us, and they are small.</p>
+    </div>
+    <div class="ptu-tiles">
+      <div class="ptu-tile ptu-lift">
+        <img src="/images/services-grid.1.svg" alt="Trekkers on a forest path in Bwindi following a ranger" loading="lazy">
+        <b>Gorilla habituation</b>
+        <span class="ptu-tile-co">Rushaga &middot; 4 permits a day</span>
+        <p>Four hours with a family still being habituated, alongside the researchers and trackers. Long days, hard walking, and the closest thing to fieldwork a visitor can buy.</p>
+      </div>
+      <div class="ptu-tile ptu-lift">
+        <img src="/images/services-grid.2.svg" alt="A chimpanzee high in the Kibale canopy" loading="lazy">
+        <b>Chimpanzee habituation</b>
+        <span class="ptu-tile-co">Kibale &middot; from 05:30</span>
+        <p>Meet the trackers at the nest before the community wakes and stay with them until they build again. Six people maximum, and you will be wet by nine.</p>
+      </div>
+      <div class="ptu-tile ptu-lift">
+        <img src="/images/services-grid.3.svg" alt="A shoebill standing motionless in papyrus at the edge of a swamp" loading="lazy">
+        <b>Shoebill and papyrus birding</b>
+        <span class="ptu-tile-co">Mabamba Bay &middot; Ramsar site</span>
+        <p>Out by motorised canoe at first light with a Mabamba Wetland Eco-Tourism Association guide. Shoebill, blue swallow, and papyrus gonolek in the same morning.</p>
+      </div>
+      <div class="ptu-tile ptu-lift">
+        <img src="/images/services-grid.4.svg" alt="A raft dropping into white water on the Nile below Jinja" loading="lazy">
+        <b>White-water on the Nile</b>
+        <span class="ptu-tile-co">Jinja &middot; grade III to V</span>
+        <p>A full day on the big water below the source with a safety kayaker per raft, or the family float on the grade III section for anyone under sixteen.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- daytrips -->
+<section class="ptu-slab">
+  <div class="ptu-frame">
+    <div class="ptu-head ptu-lift">
+      <span class="ptu-head-no">03</span>
+      <h2>Single days out of <em>Kampala and Entebbe</em>.</h2>
+      <p class="ptu-head-note">For business travellers, transit passengers and anyone with one spare day. Collection from any hotel in Kampala, Entebbe or Munyonyo is included.</p>
+    </div>
+    <ul class="ptu-ledger">
+      <li><b>Mabamba shoebill morning</b><span>Depart 05:45, canoe by 07:00, back in Kampala by 13:00. Binoculars in the vehicle.</span><i>6 hrs</i></li>
+      <li><b>Source of the Nile day</b><span>Jinja by the new expressway, source cruise, Itanda falls viewpoint and the bujagali market.</span><i>10 hrs</i></li>
+      <li><b>Ngamba Island chimpanzee sanctuary</b><span>Speedboat from Entebbe, both feeding times, sanctuary levy included.</span><i>7 hrs</i></li>
+      <li><b>Kampala on foot and by boda</b><span>Kasubi tombs, the Gaddafi mosque minaret, Owino market and a plate of luwombo.</span><i>8 hrs</i></li>
+      <li><b>Entebbe botanical gardens and lake shore</b><span>Early birding in the gardens, the wildlife education centre, lunch on the water.</span><i>5 hrs</i></li>
+      <li><b>Ssezibwa falls and Mabira forest</b><span>Forest walk with a UWA guide, the falls, and the tea estate road back.</span><i>8 hrs</i></li>
+    </ul>
+  </div>
+</section>
+
+<!-- practical -->
+<section class="ptu-slab stock">
+  <div class="ptu-frame">
+    <div class="ptu-head ptu-lift">
+      <span class="ptu-head-no">04</span>
+      <h2>How a day with us <em>actually runs</em>.</h2>
+      <p class="ptu-head-note">The same four things happen on every trip, in the same order, whatever the routing says.</p>
+    </div>
+    <div class="ptu-steps">
+      <div class="ptu-step ptu-lift">
+        <b>01</b>
+        <h3>Coffee and the plan</h3>
+        <p>Your guide runs through the day at breakfast: departure, distance, where lunch is and what time you will be off the road. Nothing is a surprise at four in the afternoon.</p>
+      </div>
+      <div class="ptu-step ptu-lift">
+        <b>02</b>
+        <h3>Roof up, radio on</h3>
+        <p>Pop-top open in the parks, hatch closed on the transfers. Guides share sightings on the network, which is why we tend to reach the lions before the convoy does.</p>
+      </div>
+      <div class="ptu-step ptu-lift">
+        <b>03</b>
+        <h3>Off the road by six</h3>
+        <p>Ugandan dusk is fast and Ugandan trucks do not have lights. We schedule arrivals before sunset and will change the plan rather than drive into the dark.</p>
+      </div>
+      <div class="ptu-step ptu-lift">
+        <b>04</b>
+        <h3>Tomorrow, confirmed</h3>
+        <p>Permits, boats and ranger allocations for the next day are confirmed by the office each evening and the guide tells you before you go up.</p>
+      </div>
+    </div>
+    <div class="ptu-splits ptu-gap">
+      <div class="ptu-split ptu-lift">
+        <h3>In the vehicle</h3>
+        <ul>
+          <li><b>Toyota Land Cruiser</b> extended, pop-top roof, seven seats used by six guests so everyone has a window</li>
+          <li><b>Cool box</b> restocked daily with bottled water, and a refill jerrycan so nobody buys plastic in the parks</li>
+          <li><b>Charging</b> at every seat, inverter for camera batteries, and a spare 4G router</li>
+          <li><b>Recovery kit</b>, two spares, high-lift jack and a winch on the Bwindi and Rwenzori vehicles</li>
+        </ul>
+      </div>
+      <div class="ptu-split ptu-lift">
+        <h3>With the guide</h3>
+        <ul>
+          <li><b>UWA-certified</b> driver-guides, all with the bird and mammal papers, none subcontracted</li>
+          <li><b>Reference library</b> in the vehicle: Stevenson and Fanshawe, Kingdon, and a Rwenzori flora</li>
+          <li><b>Binoculars</b> for each guest, 8x42, cleaned between trips</li>
+          <li><b>First aid</b> and a satellite messenger on every departure that leaves tarmac</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- quote -->
+<section class="ptu-slab wash" id="quote">
+  <div class="ptu-frame">
+    <div class="ptu-desk">
+      <div class="ptu-lift">
+        <span class="ptu-tag">Draft a routing</span>
+        <h2>Send us the shape and we will send back the days.</h2>
+        <p class="ptu-desk-note">Tell us how long you have and what you would be sorry to miss. You will get a dated day-by-day with driving distances, lodge options at three levels and the permit position for those dates &mdash; before any payment.</p>
+        <dl class="ptu-facts">
+          <div><dt>Turnaround</dt><dd>One working day for a draft routing</dd></div>
+          <div><dt>Telephone</dt><dd>+256 414 555 0182</dd></div>
+          <div><dt>WhatsApp</dt><dd>+256 772 555 0119</dd></div>
+          <div><dt>Written</dt><dd>trails@pearltrails.co.ug</dd></div>
+        </dl>
+      </div>
+      <form class="ptu-form ptu-lift" data-lead-mailto="trails@pearltrails.co.ug" data-lead-form data-lead-success="Thank you — your enquiry is with the Kampala office. We will reply within one working day with permit availability for your dates and a draft routing with driving distances on it." data-lead-error="That did not send. Please call +256 414 555 0182, message the same number on WhatsApp, or write to trails@pearltrails.co.ug and we will pick it up there.">
+        <div class="ptu-duo">
+          <div class="ptu-in"><label for="sn">Your name</label><input id="sn" name="name" required></div>
+          <div class="ptu-in"><label for="sp">Telephone or WhatsApp</label><input id="sp" name="phone"></div>
+        </div>
+        <div class="ptu-duo">
+          <div class="ptu-in"><label for="se">Email</label><input id="se" name="email" type="email" required></div>
+          <div class="ptu-in"><label for="sd">Travel dates</label><input id="sd" name="dates" placeholder="A month or a fixed window"></div>
+        </div>
+        <div class="ptu-duo">
+          <div class="ptu-in"><label for="sl">Days available</label><input id="sl" name="days" placeholder="e.g. ten on the ground"></div>
+          <div class="ptu-in"><label for="si">Itinerary of interest</label><select id="si" name="itinerary"><option>Bwindi &amp; the Crater Road</option><option>The Nile &amp; Northern Savannah</option><option>Rwenzori Central Circuit</option><option>A single day out of Kampala</option><option>Something built from scratch</option></select></div>
+        </div>
+        <div class="ptu-in"><label for="sm">What you would be sorry to miss</label><textarea id="sm" name="message" rows="4" placeholder="e.g. Gorillas and chimps, one long boat, and no driving day over five hours"></textarea></div>
+        <button class="ptu-send" type="submit">Send the enquiry</button>
+        <p class="ptu-small">Your details stay with us. No list, no resale, no follow-up you did not ask for.</p>
+        <p class="ptu-msg" data-lead-success-msg></p>
+        <p class="ptu-msg" data-lead-error-msg></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  var rm=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  var lift=document.querySelectorAll('.ptu-lift');
+  if('IntersectionObserver' in window && !rm){
+    var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('seen');io.unobserve(en.target)}})},{threshold:.08});
+    lift.forEach(function(el){io.observe(el)});
+  }else{lift.forEach(function(el){el.classList.add('seen')})}
+  document.querySelectorAll('[data-lead-form]').forEach(function(fm){
+    fm.addEventListener('submit',function(e){
+      e.preventDefault();
+      var to=fm.getAttribute('data-lead-mailto')||'';
+      var lines=[];
+      fm.querySelectorAll('input,textarea,select').forEach(function(i){
+        if(i.type==='hidden'||!i.value)return;
+        var lab=fm.querySelector('label[for="'+i.id+'"]');
+        lines.push((lab?lab.textContent.trim():(i.name||i.id))+': '+i.value);
+      });
+      var note=fm.querySelector('[data-lead-success-msg]');
+      if(note){note.textContent='Opening your email app with this enquiry ready to send. If nothing happens, write to '+to+' directly.';note.className=note.className.replace(/\bon\b/,'')+' on';}
+      window.location.href='mailto:'+to+'?subject='+encodeURIComponent('Website enquiry')+'&body='+encodeURIComponent(lines.join('\n'));
+    });
+  });
+})();
+</script>
+<!-- footer -->
+<footer class="ptu-foot">
+  <div class="ptu-frame">
+    <div class="ptu-foot-grid">
+      <div>
+        <div class="ptu-foot-mark">Pearl Trails Uganda<span>Kampala &middot; Est. 2009</span></div>
+        <p>A ground operator, not an agent. Our own vehicles, our own driver-guides, our own permits filed with the Uganda Wildlife Authority. Gorillas and chimpanzees, the savannah parks, the Nile at Jinja and the Rwenzori, arranged day by day for travellers who would rather know exactly what happens next.</p>
+      </div>
+      <div class="ptu-foot-col">
+        <b>Travel</b>
+        <a href="/services">Multi-day itineraries</a>
+        <a href="/services">Day trips from Kampala</a>
+        <a href="/pricing">Rates &amp; permits</a>
+        <a href="/contact">Enquire about dates</a>
+      </div>
+      <div class="ptu-foot-col">
+        <b>Where we go</b>
+        <a href="/services">Bwindi Impenetrable</a>
+        <a href="/services">Kibale Forest</a>
+        <a href="/services">Queen Elizabeth &amp; Ishasha</a>
+        <a href="/services">Murchison Falls &amp; the Nile</a>
+      </div>
+      <div class="ptu-foot-col">
+        <b>Office</b>
+        <span>Plot 14 Bukoto Street, Kamwokya</span>
+        <span>Kampala, Uganda</span>
+        <span>+256 414 555 0182</span>
+        <span>trails@pearltrails.co.ug</span>
+        <span>Mon&ndash;Fri 08:00&ndash;18:00 EAT, Sat to 13:00</span>
+      </div>
+    </div>
+    <div class="ptu-foot-bar">&copy; 2026 &middot; Uganda Tourism Board licence TO/1147 &middot; Member, Association of Uganda Tour Operators &middot; <em>Permits filed at cost, no markup</em></div>
+  </div>
+</footer>
+</body>
+</html>
