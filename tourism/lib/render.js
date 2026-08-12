@@ -118,9 +118,28 @@ export function tourismImage(record, opts = {}) {
   return `<img ${attrs.join(' ')}>`;
 }
 
-/** Provider attribution line. Required by both providers' terms. */
+/**
+ * Provider attribution line. Required by both providers' terms.
+ *
+ * For a synthetic image this is where the disclosure goes — in the exact place
+ * a visitor already looks for the photographer, so the absence of a credit is
+ * never a silent absence. It says what the image is instead of who took it,
+ * because nobody took it.
+ */
 export function attribution(record) {
   if (record.status !== STATUS.RESOLVED) return '';
+
+  if (record.synthetic === true || record.provider === 'synthetic') {
+    // No photographer, no source link, no provider name — there is no
+    // photograph to credit and inventing one is the failure this guards.
+    return (
+      `<span class="ptu-t-credit is-synthetic">` +
+      `<b class="ptu-t-synthetic-mark">Illustrative</b> ` +
+      `${esc(record.visualDisclosure ?? 'Illustrative image — not a photograph of the destination.')}` +
+      `</span>`
+    );
+  }
+
   const who = record.photographerUrl
     ? `<a href="${esc(record.photographerUrl)}" rel="noopener nofollow">${esc(record.photographer)}</a>`
     : esc(record.photographer);

@@ -17,6 +17,13 @@ import { rankCandidates, ACCEPT_THRESHOLD } from './ranking.js';
 import { assertProviderUrl, responsiveSet } from './cdn.js';
 import { getCategory, roleOf } from '../data/categories.js';
 import { readCache, writeCache, cacheKey } from './cache.js';
+import * as synthetic from './providers/synthetic.js';
+import { assertSyntheticSrc } from './providers/synthetic.js';
+import {
+  SYNTHETIC_PROVIDER,
+  VISUAL_DISCLOSURE,
+  syntheticEligibility,
+} from '../data/synthetic-policy.js';
 
 export const STATUS = {
   RESOLVED: 'resolved',
@@ -100,6 +107,73 @@ export function toRecord(entry, scored, { resolvedAt = new Date().toISOString() 
   };
 }
 
+/**
+ * The record written for a synthetic image.
+ *
+ * It shares the geometry and copy fields with a real record so the renderer
+ * needs no special case to lay it out — and diverges on exactly the fields
+ * that constitute a claim. photographer, photographerUrl, sourceUrl and
+ * downloadLocation are null, not absent: a null that the audit can assert on
+ * is stronger than a missing key it might overlook.
+ */
+export function toSyntheticRecord(entry, candidate, { resolvedAt = new Date().toISOString() } = {}) {
+  const role = roleOf(getCategory(entry.category));
+  const ratio = candidate.width / candidate.height;
+
+  return {
+    country: entry.country,
+    countryName: entry.countryName,
+    category: entry.category,
+    categoryTitle: entry.categoryTitle,
+    no: entry.no,
+    role: role.id,
+    status: STATUS.RESOLVED,
+
+    caption: entry.caption,
+    description: entry.description,
+    alt: entry.alt,
+    searchQuery: entry.searchQuery,
+
+    // what this is
+    provider: SYNTHETIC_PROVIDER,
+    synthetic: true,
+    sourceType: 'generated',
+    generationPrompt: candidate.generationPrompt,
+    generationModel: candidate.generationModel,
+    generatedAt: candidate.generatedAt,
+    visualDisclosure: VISUAL_DISCLOSURE,
+
+    photoId: candidate.photoId,
+    imageUrl: assertSyntheticSrc(candidate.baseUrl),
+    baseUrl: candidate.baseUrl,
+    thumbnailUrl: candidate.thumbnailUrl,
+
+    // never fabricated, never inherited
+    sourceUrl: null,
+    downloadLocation: null,
+    photographer: null,
+    photographerUrl: null,
+
+    width: candidate.width,
+    height: candidate.height,
+    aspectRatio: Number(ratio.toFixed(4)),
+    focalPoint: entry.focalPoint,
+    dominantColor: candidate.color,
+
+    // No provider CDN to resize on, so the file is served as committed. The
+    // single-entry srcset keeps the render path identical to a real record.
+    srcset: null,
+    sizes: role.sizes,
+    renderRatio: role.ratio,
+    mobileRatio: role.mobileRatio,
+    loading: role.eager ? 'eager' : 'lazy',
+
+    score: null,
+    scoreParts: {},
+    resolvedAt,
+  };
+}
+
 /** The record written when nothing acceptable was found. */
 export function toUnresolved(entry, reason, { resolvedAt = new Date().toISOString() } = {}) {
   const role = roleOf(getCategory(entry.category));
@@ -147,12 +221,18 @@ export async function resolveEntry(entry, destination, opts) {
     fetchImpl,
     log = () => {},
     onCandidates = null,
+    allowSynthetic = true,
+    syntheticDir = undefined,
   } = opts;
 
   const role = roleOf(getCategory(entry.category));
   const attempts = [];
 
-  const order = only
+  // Real photography first, always. Synthetic is never in this loop — it is
+  // considered only after both real providers have failed, and only for a
+  // slot the policy has cleared. A synthetic image cannot outrank a real
+  // photograph because it is never ranked against one.
+  const order = only && only !== SYNTHETIC_PROVIDER
     ? [only]
     : ['unsplash', 'pexels'];
 
@@ -229,6 +309,25 @@ export async function resolveEntry(entry, destination, opts) {
         `${rejected} below threshold`,
     );
     return toRecord(entry, best);
+  }
+
+  // Last resort: a committed synthetic image, for an explicitly allowed slot.
+  const eligibility = syntheticEligibility(entry, destination);
+  if (allowSynthetic && eligibility.allowed) {
+    const { candidate, problems } = synthetic.lookup(
+      entry,
+      syntheticDir ? { dir: syntheticDir } : {},
+    );
+    for (const problem of problems) {
+      attempts.push({ provider: SYNTHETIC_PROVIDER, error: problem });
+      log(`      synthetic rejected: ${problem}`);
+    }
+    if (candidate) {
+      log(`      synthetic ok — ${candidate.photoId} (illustrative, disclosed)`);
+      return toSyntheticRecord(entry, candidate);
+    }
+  } else if (allowSynthetic) {
+    log(`      synthetic not permitted here: ${eligibility.reasons[0]}`);
   }
 
   const reason = attempts.length

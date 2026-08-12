@@ -103,6 +103,66 @@ untouched, rather than a silent no-op that lets you think your decision took eff
 Hand-pinning is also the easiest way to use one photograph twice, so a duplicate check
 runs after overrides are applied.
 
+### The authenticity rule
+
+**Real photography for real places and people. Synthetic imagery only for
+clearly illustrative visuals. The visitor must always be able to tell which is
+which.** This is a core Afrinkong principle, and it is enforced by the build
+rather than by convention.
+
+`tourism/data/synthetic-policy.js` is the single place that decides; the
+resolver, the audit, the renderer and the review sheet all ask it, so the rule
+cannot drift between what is enforced and what is displayed.
+
+```sh
+npm run tourism:synthetic-policy          # which slots qualify, and why not
+npm run tourism:synthetic-policy -- --all # the refusal reason for every slot
+```
+
+**Ten of the 405 slots** may ever carry a synthetic image. Three gates, all of
+which must pass, none of which is inferred:
+
+1. The category is in `SYNTHETIC_ALLOWED_CATEGORIES` — `hero`, `scenic`,
+   `whyvisit`, and nothing else. The other 24 are real-photography-only, listed
+   explicitly in `REAL_ONLY_CATEGORIES` so the protection is legible in a diff.
+2. A hero qualifies only for the region, never a country. A country hero is the
+   opening frame of a page selling that country — a specific destination claim.
+3. The slot names no recognisable place or species. `uganda/scenic` is an
+   allowed *category* but its subject names Ishasha and the Rwenzori, so it is
+   refused. A named place beats the allowlist, always. So does a species: a
+   generated shoebill is a false wildlife record.
+
+Provider preference is `unsplash → pexels → synthetic`. Synthetic is never
+ranked against real photography — it is consulted only after both real
+providers have failed, so a synthetic image cannot outscore a photograph.
+
+A synthetic record carries `synthetic: true`, `provider: "synthetic"`,
+`sourceType: "generated"`, its `generationPrompt`, `generationModel`,
+`generatedAt`, and a `visualDisclosure`. Its `photographer`, `photographerUrl`,
+`sourceUrl` and `downloadLocation` are explicit nulls — a null the audit can
+assert on is stronger than a missing key it might overlook. Where a photograph
+renders `Photograph <name> · Unsplash`, a synthetic image renders
+**ILLUSTRATIVE — not a photograph of the destination** in the same position.
+
+`npm run tourism:validate` **errors** — the build fails — if a synthetic record
+credits a photographer, carries a stock URL, is missing its disclosure or any
+part of its generation record, has its flags disagree, or sits in a
+real-photography-only category. The path guard catches an image under
+`/assets/synthetic/` even when the record claims `provider: "unsplash"` and
+`synthetic: false`.
+
+Completion is reported three ways and never summed into one number, because a
+slot carrying an illustrative image is not a slot showing the destination:
+
+```
+TOTAL
+  REAL:          0/405
+  SYNTHETIC:     0/405
+  UNRESOLVED:  405/405
+```
+
+See `assets/synthetic/README.md` for the file contract.
+
 ### Running it on GitHub instead
 
 `.github/workflows/tourism-images.yml` does the same three steps and opens a pull request

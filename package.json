@@ -13,11 +13,15 @@
     "tourism:prompts": "node tourism/scripts/generate-prompts.mjs",
     "tourism:review": "node tourism/scripts/build-review.mjs",
     "tourism:apply-overrides": "node tourism/scripts/apply-overrides.mjs",
+    "tourism:synthetic-policy": "node tourism/scripts/synthetic-policy.mjs",
     "tourism:build-pages": "node tourism/scripts/build-pages.mjs",
     "tourism:build": "npm run tourism:build-pages && npm run tourism:validate",
     "test": "node --test \"tourism/tests/*.test.mjs\"",
     "typecheck": "node --check tourism/scripts/resolve-images.mjs && node tourism/scripts/typecheck.mjs",
     "lint": "node tourism/scripts/lint.mjs",
     "build": "npm run tourism:build-pages"
+  },
+  "devDependencies": {
+    "playwright": "^1.62.1"
   }
 }

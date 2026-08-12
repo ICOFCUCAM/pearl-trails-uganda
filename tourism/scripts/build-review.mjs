@@ -29,6 +29,7 @@ import { buildBrief } from '../lib/prompt.js';
 import { variantUrl } from '../lib/cdn.js';
 import { STATUS } from '../lib/resolver.js';
 import { esc } from '../lib/render.js';
+import { syntheticEligibility, VISUAL_DISCLOSURE } from '../data/synthetic-policy.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const REVIEW_DIR = resolve(ROOT, 'tourism/review');
@@ -78,6 +79,7 @@ code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 .pill.ok{color:var(--accent);border-color:var(--accent)}
 .pill.none{color:var(--bad);border-color:var(--bad)}
 .pill.pin{color:var(--warn);border-color:var(--warn)}
+.pill.synth{color:#b79cf5;border-color:#8a6bd8}
 .row{display:grid;grid-template-columns:260px 1fr;gap:18px;padding:16px}
 @media(max-width:900px){.row{grid-template-columns:1fr}}
 .brief{font-size:12.5px}
@@ -89,6 +91,22 @@ code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 .cand{border:1px solid var(--line);border-radius:4px;overflow:hidden;background:#0e100c;display:flex;flex-direction:column}
 .cand.is-pick{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .cand.is-ref{border-color:var(--warn)}
+.cand.is-synthetic{border-color:#8a6bd8}
+.badge{font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;font-weight:700;padding:4px 8px;display:block;text-align:center}
+.badge.real{background:#173226;color:#7fd4a8}
+.badge.synth{background:#241a3d;color:#b79cf5}
+.badge.ref{background:#33280f;color:var(--warn)}
+.score.synth{color:#b79cf5}
+/* The synthetic card's lines must never be clipped — "no photographer" is the
+   whole point of the card, so it wraps rather than ellipsing. */
+.cand.is-synthetic .who{white-space:normal;overflow:visible;text-overflow:clip}
+.disclosure{font-size:10.5px;line-height:1.4;color:#b79cf5;border-top:1px solid var(--line);padding-top:6px}
+.cand details{font-size:11px}
+.cand details summary{cursor:pointer;color:var(--dim)}
+.cand details pre{white-space:pre-wrap;word-break:break-word;font-size:10px;color:var(--dim);margin-top:5px}
+.policy{font-size:11px;padding:7px 16px;border-bottom:1px solid var(--line);color:var(--dim)}
+.policy.real-only{color:#7fd4a8}
+.policy.synth-ok{color:#b79cf5}
 .cand img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#000}
 .cand .body{padding:9px 10px;display:flex;flex-direction:column;gap:6px;flex:1}
 .cand .who{font-size:11px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -142,17 +160,38 @@ function candidateCard(slot, candidate, isPick) {
   const pass = candidate.accepted;
   return `
         <div class="cand${isPick ? ' is-pick' : ''}">
+          <span class="badge real">Real photograph</span>
           <a href="${esc(candidate.sourceUrl)}" target="_blank" rel="noopener">
             <img src="${esc(src)}" alt="Candidate ${esc(candidate.photoId)} for ${esc(slot)}" loading="lazy">
           </a>
           <div class="body">
             <span class="score ${pass ? 'pass' : 'fail'}">${candidate.score}${pass ? '' : ' · below threshold'}</span>
             <span class="parts">${partsHtml(candidate.scoreParts)}</span>
-            <span class="who">${esc(candidate.provider)} · ${esc(candidate.photographer)}</span>
+            <span class="who">${esc(candidate.provider === 'unsplash' ? 'Unsplash' : 'Pexels')} · ${esc(candidate.photographer)}</span>
             <span class="who">${esc(candidate.width)}×${esc(candidate.height)} · ${esc((candidate.description || '').slice(0, 60))}</span>
             <div class="acts">
               <button onclick="pin('${esc(slot)}','${esc(candidate.provider)}','${esc(candidate.photoId)}')">Pin this</button>
             </div>
+          </div>
+        </div>`;
+}
+
+/**
+ * A published synthetic image. Presented so it can never be mistaken for one
+ * of the cards above: different badge, different border, no photographer line
+ * at all, and the generation prompt on show rather than a credit.
+ */
+function syntheticCard(slot, record) {
+  return `
+        <div class="cand is-synthetic">
+          <span class="badge synth">Synthetic / illustrative</span>
+          <img src="../../${esc(String(record.imageUrl).replace(/^\//, ''))}" alt="Illustrative image for ${esc(slot)}" loading="lazy">
+          <div class="body">
+            <span class="score synth">Generated image</span>
+            <span class="who">No photographer &mdash; nobody took this</span>
+            <span class="who">${esc(record.generationModel ?? 'model not recorded')} &middot; ${esc(String(record.generatedAt ?? '').slice(0, 10))}</span>
+            <details><summary>Generation prompt</summary><pre>${esc(record.generationPrompt ?? '')}</pre></details>
+            <span class="disclosure">${esc(record.visualDisclosure ?? VISUAL_DISCLOSURE)}</span>
           </div>
         </div>`;
 }
@@ -162,6 +201,7 @@ function referenceCard(slot, files) {
     .map(
       (file) => `
         <div class="cand is-ref">
+          <span class="badge ref">Reference &mdash; never published</span>
           <img src="../generated/${esc(file)}" alt="Generated reference for ${esc(slot)}" loading="lazy">
           <div class="body">
             <span class="score">reference</span>
@@ -178,14 +218,22 @@ function slotBlock(destination, entry, record, shortlist, generated, override) {
   const slot = `${entry.country}/${entry.category}`;
   const pickKey = record.status === STATUS.RESOLVED ? `${record.provider}:${record.photoId}` : null;
 
-  const status = override
-    ? '<span class="pill pin">pinned</span>'
-    : record.status === STATUS.RESOLVED
-      ? '<span class="pill ok">resolved</span>'
-      : '<span class="pill none">unresolved</span>';
+  const status = record.synthetic === true
+    ? '<span class="pill synth">synthetic</span>'
+    : override
+      ? '<span class="pill pin">pinned</span>'
+      : record.status === STATUS.RESOLVED
+        ? '<span class="pill ok">real photograph</span>'
+        : '<span class="pill none">unresolved</span>';
+
+  const eligibility = syntheticEligibility(entry, destination);
+  const policyLine = eligibility.allowed
+    ? '<div class="policy synth-ok">Synthetic permitted here — non-specific illustrative visual. Real photography still preferred.</div>'
+    : `<div class="policy real-only">Real photography only — ${esc(eligibility.reasons[0])}</div>`;
 
   const cards = [
     generated.length ? referenceCard(slot, generated) : '',
+    record.synthetic === true ? syntheticCard(slot, record) : '',
     ...shortlist.map((c) => candidateCard(slot, c, `${c.provider}:${c.photoId}` === pickKey)),
   ]
     .filter(Boolean)
@@ -200,6 +248,7 @@ function slotBlock(destination, entry, record, shortlist, generated, override) {
         ${status}
         <span class="meta" style="margin-left:auto">${shortlist.length} candidate(s)${generated.length ? ` · ${generated.length} reference(s)` : ''}</span>
       </div>
+      ${policyLine}
       <div class="row">
         <div class="brief">
           <p><b>Looking for:</b> ${esc(entry.subject)}</p>

@@ -182,6 +182,11 @@ ul,ol{list-style:none}
 .ptu-t-credit{display:block;margin-top:10px;font-family:var(--ptu-num);font-size:10px;letter-spacing:.09em;color:var(--c-muted)}
 .ptu-t-credit a{border-bottom:1px solid var(--c-border)}
 .ptu-t-credit a:hover{color:var(--c-accent);border-bottom-color:var(--c-accent)}
+/* The synthetic disclosure sits where the photographer credit would be, and is
+   deliberately more prominent than one: a visitor must be able to tell an
+   illustration from a photograph without looking for it. */
+.ptu-t-credit.is-synthetic{color:var(--c-ink);opacity:.85}
+.ptu-t-synthetic-mark{display:inline-block;margin-right:7px;padding:2px 7px;border:1px solid currentColor;border-radius:2px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:9px}
 
 /* ---- destination hero ---------------------------------------------------------- */
 .ptu-t-hero{position:relative;min-height:min(88svh,860px);display:flex;align-items:flex-end;overflow:hidden;background:var(--ptu-deep)}

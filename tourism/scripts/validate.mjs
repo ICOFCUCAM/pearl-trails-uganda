@@ -95,6 +95,8 @@ function main() {
   let totalResolved = 0;
   let totalUnsplash = 0;
   let totalPexels = 0;
+  let totalReal = 0;
+  let totalSynthetic = 0;
   let totalUnresolved = 0;
   let totalDuplicates = 0;
 
@@ -102,26 +104,38 @@ function main() {
     const label = stat.isRegion ? `${stat.name} (region)` : stat.name;
     console.log(label.toUpperCase());
     console.log(`  ${num(stat.present, 2)}/${stat.total} categories`);
-    console.log(`  ${num(stat.unsplash, 2)} Unsplash`);
-    console.log(`  ${num(stat.pexels, 2)} Pexels`);
+    console.log(`  ${num(stat.real, 2)} real photography`);
+    console.log(`  ${num(stat.unsplash, 2)}    Unsplash`);
+    console.log(`  ${num(stat.pexels, 2)}    Pexels`);
+    console.log(`  ${num(stat.synthetic, 2)} synthetic (illustrative)`);
     console.log(`  ${num(stat.unresolved, 2)} unresolved`);
     console.log(`  ${num(stat.duplicates, 2)} duplicates`);
     console.log('');
     totalResolved += stat.resolved;
     totalUnsplash += stat.unsplash;
     totalPexels += stat.pexels;
+    totalReal += stat.real;
+    totalSynthetic += stat.synthetic;
     totalUnresolved += stat.unresolved;
     totalDuplicates += stat.duplicates;
     void slug;
   }
 
+  // Real completion, synthetic completion and unresolved are reported as three
+  // separate numbers and never summed into one "done". A slot carrying an
+  // illustrative image is not a slot showing the destination.
+  const total = records.length;
   console.log('TOTAL');
-  console.log(`  ${num(records.length, 3)} image records`);
-  console.log(`  ${num(totalResolved, 3)} resolved`);
+  console.log(`  REAL:        ${num(totalReal, 3)}/${total}`);
+  console.log(`  SYNTHETIC:   ${num(totalSynthetic, 3)}/${total}`);
+  console.log(`  UNRESOLVED:  ${num(totalUnresolved, 3)}/${total}`);
+  console.log('');
   console.log(`  ${num(totalUnsplash, 3)} Unsplash`);
   console.log(`  ${num(totalPexels, 3)} Pexels`);
-  console.log(`  ${num(totalUnresolved, 3)} unresolved`);
   console.log(`  ${num(totalDuplicates, 3)} duplicate uses`);
+  if (totalResolved !== totalReal + totalSynthetic) {
+    console.log(`  WARNING: ${totalResolved} resolved but ${totalReal} real + ${totalSynthetic} synthetic`);
+  }
 
   const kinds = [
     ['broken-url', 'Broken / non-provider URLs'],
@@ -136,6 +150,7 @@ function main() {
     ['bad-focal-point', 'Bad focal points'],
     ['invalid-provider', 'Invalid provider records'],
     ['missing-attribution', 'Missing attribution'],
+    ['authenticity', 'AUTHENTICITY VIOLATIONS'],
     ['unresolved', 'Unresolved slots'],
     ['leaked-key', 'Leaked API keys'],
     ['placeholder-remaining', 'Pages still on SVG placeholders'],

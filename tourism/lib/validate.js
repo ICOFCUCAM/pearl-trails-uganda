@@ -16,6 +16,15 @@ import { CATEGORY_IDS, getCategory, roleOf } from '../data/categories.js';
 import { STATUS } from './resolver.js';
 import { assertProviderUrl } from './cdn.js';
 import { getCredentials } from './env.js';
+import { assertSyntheticSrc, isSyntheticSrc } from './providers/synthetic.js';
+import {
+  SYNTHETIC_PROVIDER,
+  SYNTHETIC_ALLOWED_CATEGORIES,
+  REAL_ONLY_CATEGORIES,
+  VISUAL_DISCLOSURE,
+  syntheticEligibility,
+  isRealProvider,
+} from '../data/synthetic-policy.js';
 
 /** How far a photo's own aspect may sit from its role before it is flagged. */
 const ASPECT_TOLERANCE = 2.6;
@@ -46,6 +55,12 @@ export function auditManifest(manifest) {
       resolved: resolved.length,
       unsplash: resolved.filter((r) => r.provider === 'unsplash').length,
       pexels: resolved.filter((r) => r.provider === 'pexels').length,
+      // Real and synthetic completion are counted apart, never summed into a
+      // single "done". A slot filled by an illustrative image is not the same
+      // as a slot filled by a photograph of the place, and the report must
+      // not let the two hide behind one number.
+      real: resolved.filter((r) => isRealProvider(r.provider)).length,
+      synthetic: resolved.filter((r) => r.synthetic === true).length,
       unresolved: own.filter((r) => r.status === STATUS.UNRESOLVED).length,
       duplicates: 0,
     });
@@ -102,6 +117,100 @@ export function auditManifest(manifest) {
     }
 
     /* resolved records only, from here */
+
+    /* ---- the authenticity audit ----
+     *
+     * A synthetic image is only publishable when it declares itself, carries
+     * no photographic attribution, and sits in a slot the policy cleared.
+     * Every one of these is an ERROR: the build fails rather than shipping an
+     * image a visitor could mistake for a photograph of the place.
+     */
+    const claimsSynthetic =
+      record.synthetic === true ||
+      record.provider === SYNTHETIC_PROVIDER ||
+      record.sourceType === 'generated' ||
+      isSyntheticSrc(record.imageUrl);
+
+    if (claimsSynthetic) {
+      // The four flags must agree. A record that is synthetic in one field and
+      // photographic in another is the exact ambiguity the policy forbids.
+      if (record.synthetic !== true) {
+        add('error', 'authenticity', 'looks generated but synthetic !== true', where);
+      }
+      if (record.provider !== SYNTHETIC_PROVIDER) {
+        add('error', 'authenticity', `synthetic image has provider "${record.provider}"`, where);
+      }
+      if (record.sourceType !== 'generated') {
+        add('error', 'authenticity', `synthetic image has sourceType "${record.sourceType}"`, where);
+      }
+      if (!record.visualDisclosure) {
+        add('error', 'authenticity', 'synthetic image has no visualDisclosure', where);
+      } else if (record.visualDisclosure !== VISUAL_DISCLOSURE) {
+        add('error', 'authenticity', 'visualDisclosure text has been altered', where);
+      }
+
+      // Nothing that would dress it as a photograph.
+      if (record.photographer) {
+        add('error', 'authenticity', `synthetic image credits "${record.photographer}"`, where);
+      }
+      if (record.photographerUrl) {
+        add('error', 'authenticity', 'synthetic image has a photographer URL', where);
+      }
+      if (record.sourceUrl) {
+        add('error', 'authenticity', `synthetic image has sourceUrl ${record.sourceUrl}`, where);
+      }
+      if (record.downloadLocation) {
+        add('error', 'authenticity', 'synthetic image has a provider download location', where);
+      }
+      for (const field of ['imageUrl', 'baseUrl', 'thumbnailUrl']) {
+        if (/unsplash|pexels/i.test(String(record[field] ?? ''))) {
+          add('error', 'authenticity', `${field} points at a stock provider`, where);
+        }
+      }
+
+      // The generation record must be complete, or the disclosure is unbacked.
+      for (const field of ['generationPrompt', 'generationModel', 'generatedAt']) {
+        if (!record[field]) {
+          add('error', 'authenticity', `synthetic image has no ${field}`, where);
+        }
+      }
+
+      // The slot must be allowed — checked here and not merely at resolve
+      // time, so a hand-edited manifest cannot smuggle one in.
+      if (REAL_ONLY_CATEGORIES.includes(record.category)) {
+        add(
+          'error',
+          'authenticity',
+          `"${record.category}" is real-photography-only — synthetic image not permitted`,
+          where,
+        );
+      } else if (!SYNTHETIC_ALLOWED_CATEGORIES.includes(record.category)) {
+        add(
+          'error',
+          'authenticity',
+          `"${record.category}" is not in SYNTHETIC_ALLOWED_CATEGORIES`,
+          where,
+        );
+      } else {
+        const destination = ALL_DESTINATIONS.find((d) => d.slug === record.country);
+        const entry = destination?.byCategory?.[record.category];
+        if (entry) {
+          const { allowed, reasons } = syntheticEligibility(entry, destination);
+          if (!allowed) {
+            add('error', 'authenticity', `synthetic not permitted: ${reasons[0]}`, where);
+          }
+        }
+      }
+
+      try {
+        assertSyntheticSrc(record.imageUrl);
+      } catch (error) {
+        add('error', 'broken-url', `imageUrl: ${error.message}`, where);
+      }
+      continue;
+    }
+
+    /* ---- real photography ---- */
     if (!record.provider || !['unsplash', 'pexels'].includes(record.provider)) {
       add('error', 'invalid-provider', `provider "${record.provider}"`, where);
     }

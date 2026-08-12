@@ -73,6 +73,24 @@ export function variantUrl(record, { width, aspect = null, quality = 85 } = {}) 
  */
 export function responsiveSet(record, roleId) {
   const role = getRole(roleId);
+
+  // A synthetic image is a file we committed, not something on a provider CDN
+  // that can resize on demand. It is served exactly as generated: one src, no
+  // srcset, no variant parameters. Intrinsic dimensions come from the sidecar
+  // so the layout still reserves the right box.
+  if (record.synthetic === true || record.provider === 'synthetic') {
+    return {
+      src: record.imageUrl ?? record.baseUrl,
+      srcset: null,
+      sizes: role.sizes,
+      width: record.width,
+      height: record.height,
+      ratio: role.ratio,
+      mobileRatio: role.mobileRatio,
+      loading: role.eager ? 'eager' : 'lazy',
+      fetchpriority: role.eager ? 'high' : 'auto',
+    };
+  }
   const widths = role.widths.filter((w) => w <= record.width || w === role.widths[0]);
   const ladder = widths.length ? widths : [role.widths[0]];
 
