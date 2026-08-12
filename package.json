@@ -15,6 +15,6 @@
     "test": "node --test \"tourism/tests/*.test.mjs\"",
     "typecheck": "node --check tourism/scripts/resolve-images.mjs && node tourism/scripts/typecheck.mjs",
     "lint": "node tourism/scripts/lint.mjs",
-    "build": "npm run tourism:build-pages"
+    "pages": "npm run tourism:build-pages"
   }
 }
